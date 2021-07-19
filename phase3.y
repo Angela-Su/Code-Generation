@@ -104,6 +104,22 @@ Ident: IDENT
         $$.code = strdup("");
     }
     ;
+    
+Idents: Ident
+    {
+        $$.place = strdup($1);
+        $$.code = strdup("");
+    }
+    | Ident COMMA Idents
+    {
+        std::string temp;
+        temp.append($1.place);
+        temp.append("|");
+        temp.append($3.place);
+        $$.place = strdup(temp.c_str());
+        $$.code = strdup("");
+    }
+    ; 
 
 Comp: EQ
     {
