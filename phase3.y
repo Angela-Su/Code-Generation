@@ -66,6 +66,38 @@ Program:    %empty
     }
     ;
     
+Function: FUNCTION FuncIdent SEMICOLON BEGINPARAMS declarations ENDPARAMS BEGINLOCALS declarations ENDLOCALS BEGINBODY statements ENDBODY
+    {
+        std::string temp = "func ";
+        temp.append($2.place);
+        temp.append("\n");
+        std::string s = $2.place;
+        if( s == "main"){
+            mainFunc = true;
+        }
+        temp.append($5.code);
+        std::string decs = $5.code;
+        int decNum = 0;
+        while(decs.find(".") != std::string::npos){
+            int pos = decs.find(".");
+            decs.replace(pos, 1, "=")'
+            std::string part = ", $" + std::to_string(decNum) + "\n";
+            decNum++;
+            decs.replace(decs.find("\n", pos), 1, part);
+        }
+        temp.append(decs);
+
+        temp.append($8.code);
+        std::string statements = $11.code;
+        if(statements.find("continue") != std::string::npos){
+            printf("Error: Continue outside loop in function %s\n", $2.place);
+        }
+        temp.append(statements);
+        temp.append("endfunc\n\n");
+        printf(temp.c_str());
+    }
+    ;    
+ 
 Ident: IDENT
     {
         $$.place = strdup($1);
