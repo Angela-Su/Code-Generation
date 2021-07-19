@@ -153,6 +153,39 @@ Comp: EQ
     }
     ;   
 
+Var: IDENT
+    {
+        std::string temp;
+        std::string ident = $1.place;
+        if(funcs.find(ident) == funcs.end() && varTemp.find(indent) == varTemp.end()){
+            printf("Identifier %s is not declared.\n", ident.c_str());
+        }
+        else if(arrSize[ident] > 1){
+            printf("Didn't provide index for the array Identifier %s.\n", ident.c_str());
+        }
+        $$.code = strdup("");
+        $$.place = strdup(ident.c_str());
+        $$.arr = false;
+    }
+    | IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET
+    {
+        std::string temp;
+        std::string ident = $1.place;
+        if(funcs.find(ident) == funcs.end() && varTemp.find(indent) == varTemp.end()){
+            printf("Identifier %s is not declared.\n", ident.c_str());
+        }
+        else if(arrSize[ident] == 1){
+            printf("Provided index for non-array Identifier %s.\n", ident.c_str());
+        }
+        temp.append($1.code);
+        temp.append(", ")'
+        temp.append($3.place);
+        $$.code = strdup($3.code);
+        $$.place = strdup(temp.c_str());
+        $$.arr = true;
+    }
+    ;
+
 %%
 void yyerror(const char* s)
 {
