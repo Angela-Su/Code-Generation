@@ -140,11 +140,11 @@ var: IDENT {
     printf("IDENT\n");
     std::string temp;
     std::string ident=$1.place;
-    if(functions.find(ident) == functions.end() && varTemp.find(ident)==varTemp.end()){
+    if(funcs.find(ident) == functions.end() && varTemp.find(ident)==varTemp.end()){
         printf("Identifier %s is not declared.\n",ident.c_str());
     }
     else(if(arrSize[ident]>1){
-        printf("Did not provide index for array Identifier %s.\n". ident.c_str());
+        printf("Did not provide index for array Identifier %s.\n", ident.c_str());
     }
     $$.code = strdup("");
     $$.place=strdup(ident.c_str());
