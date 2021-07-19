@@ -42,8 +42,8 @@ std::string new_label();
 %left MULT DIV MOD
 %%
 
-prog_start: functions { printf("prog_start -> functions\n");}
-        ;
+/*prog_start: functions { printf("prog_start -> functions\n");}
+        ;*/
 Program:    %empty
     {
         if (!mainFunc){
@@ -127,9 +127,28 @@ statement: var ASSIGN expression { printf("statement -> var ASSIGN expression\n"
             | RETURN expression {printf("statement -> RETURN expression\n");}
         ;
         
-bool_expr:         L_PAREN relation_and_expr R_PAREN{printf("relation_and_expr -> relation_expr\n");}
-            | L_PAREN relation_and_expr OR bool_expr R_PAREN {printf("relation_and_expr -> relation_expr OR bool_expr\n");}
-            ;
+Bool_expr: relation_and_expr
+    {
+        $$.code = strdup($1.code);
+        $$.place = strdup(1.place);
+    }
+    | relation_and_expr OR bool_expr
+    {
+        std::string temp;
+        std::string dst = new_temp();
+        temp.append($1.code);
+        temp.append($3.code);
+        temp += ". " + dst + "\n";
+        temp += "|| " + dst + ", ";
+        temp.append($1.place);
+        temp.append(", ");
+        temp.append($3.place);
+        tmep.append("\n");
+        $$.code = strdup(temp.c_str());
+        $$.place = strdup(dst.c_str());
+    }
+    ;
+
 
 relation_and_expr:  relation_expr {printf("relation_and_expr -> relation_expr\n");}
             | relation_expr AND relation_expr {printf("relation_and_expr -> relation_expr AND relation_and_expr\n");}
@@ -206,10 +225,62 @@ expression: multiplicative-expr {printf("expression -> multiplicative-expr\n");}
             | multiplicative-expr ADD multiplicative-expr {printf("expression -> multiplicative-expr ADD multiplicative-expr\n");}
             | multiplicative-expr SUB multiplicative-expr {printf("expression -> multiplicative-expr SUB multiplicative-expr\n");}
             ;
-multiplicative-expr: term {printf("multiplicative-expr -> term\n");}
-                    | term MULT multiplicative-expr {printf("multiplicative-expr -> term MULT multiplicative-expr\n");}
-                    | term DIV multiplicative-expr {printf("multiplicative-expr -> term DIV multiplicative-expr\n");}
-                    | term MOD multiplicative-expr {printf("multiplicative-expr -> term MOD multiplicative-expr\n");}
+multiplicative-expr: term {
+                    std::string temp;
+                    std::string dst=new_temp();
+                    temp.append($1.code);
+                    temp.append($1.place);
+                    $$.code = strdup(temp.c_str());
+                    $$.place = strdup(temp.c_str()); /*went freeballing here, might need fixing*/
+                    }
+                    | term MULT multiplicative-expr {
+                        std::string temp;
+                        std::string dst = new_temp();
+                        temp.append($1.code);
+                        temp.append($3.code);
+                        temp.append(". ");
+                        temp.append(dst);
+                        temp.append("\n");
+                        temp +="* " + dst + ", ";
+                        temp.append($1.place);
+                        temp+=", ";
+                        temp.append($3.place);
+                        temp+="\n";
+                        $$.code = strdup(temp.c_str());
+                        $$.place = strdup(dst.c_str());
+                    }
+                    | term DIV multiplicative-expr {
+                        std::string temp;
+                        std::string dst = new_temp();
+                        temp.append($1.code);
+                        temp.append($3.code);
+                        temp.append(". ");
+                        temp.append(dst);
+                        temp.append("\n");
+                        temp +="/ " + dst + ", ";
+                        temp.append($1.place);
+                        temp+=", ";
+                        temp.append($3.place);
+                        temp+="\n";
+                        $$.code = strdup(temp.c_str());
+                        $$.place = strdup(dst.c_str());
+                    }
+                    | term MOD multiplicative-expr {
+                        std::string temp;
+                        std::string dst = new_temp();
+                        temp.append($1.code);
+                        temp.append($3.code);
+                        temp.append(". ");
+                        temp.append(dst);
+                        temp.append("\n");
+                        temp +="% " + dst + ", ";
+                        temp.append($1.place);
+                        temp+=", ";
+                        temp.append($3.place);
+                        temp+="\n";
+                        $$.code = strdup(temp.c_str());
+                        $$.place = strdup(dst.c_str());
+                    }
                     ;
 term: SUB var {printf("term -> SUB var\n");}
     | SUB NUMBER {printf("term -> SUB NUMBER\n");}
