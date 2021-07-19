@@ -80,7 +80,7 @@ Function: FUNCTION FuncIdent SEMICOLON BEGINPARAMS declarations ENDPARAMS BEGINL
         int decNum = 0;
         while(decs.find(".") != std::string::npos){
             int pos = decs.find(".");
-            decs.replace(pos, 1, "=")'
+            decs.replace(pos, 1, "=");
             std::string part = ", $" + std::to_string(decNum) + "\n";
             decNum++;
             decs.replace(decs.find("\n", pos), 1, part);
