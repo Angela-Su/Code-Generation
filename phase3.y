@@ -121,6 +121,28 @@ Idents: Ident
     }
     ; 
 
+Bool_expr: relation_and_expr
+    {
+        $$.code = strdup($1.code);
+        $$.place = strdup(1.place);
+    }
+    | relation_and_expr OR bool_expr
+    {
+        std::string temp;
+        std::string dst = new_temp();
+        temp.append($1.code);
+        temp.append($3.code);
+        temp += ". " + dst + "\n";
+        temp += "|| " + dst + ", ";
+        temp.append($1.place);
+        temp.append(", ");
+        temp.append($3.place);
+        tmep.append("\n");
+        $$.code = strdup(temp.c_str());
+        $$.place = strdup(dst.c_str());
+    }
+    ;
+
 Comp: EQ
     {
         $$.place = strdup("");
