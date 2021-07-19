@@ -35,8 +35,19 @@ function: FUNCTION IDENT SEMICOLON BEGINPARAMS declarations ENDPARAMS BEGINLOCAL
             {printf("function -> FUNCTION IDENT SEMICOLON BEGINPARAMS declarations ENDPARAMS BEGINLOCALS declarations ENDLOCALS BEGIN BODY statements ENDBODY\n");}
         ;
 
-declarations: /*empty*/{printf("declarations -> epsilon\n");}
-            | declaration SEMICOLON declarations {printf("declarations -> declaration SEMICOLON declarations\n");}
+declarations: /*empty*/{
+                /*printf("declarations -> epsilon\n");*/
+                $$.place = strdup("");
+                $$.code = strdup("");
+                }
+            | declaration SEMICOLON declarations {
+                /*printf("declarations -> declaration SEMICOLON declarations\n");*/
+                std::string temp;
+                temp.append($1.code);
+                temp.append($3.code);
+                $$.code = strdup(temp.c_str());
+                $$.place=strdup("");
+                }
             ;
 
 declaration:        IDENT COLON INTEGER {printf("declaration -> IDENT COLON INTEGER\n");}
@@ -83,7 +94,7 @@ comp: EQ {printf("comp -> EQ\n");}
     | GT {printf("comp -> GT\n");}
     | LTE {printf("comp -> LTE\n");}
     | GTE {printf("comp -> GTE\n");}
-    
+    ;
 expressions: expression COMMA expressions {printf("expressions -> expression COMMA expressions\n");}
             | expression {printf("expressions-> expression\n");}
             ;
@@ -108,7 +119,20 @@ term: SUB var {printf("term -> SUB var\n");}
 vars:  var {printf("vars -> var\n");}
         |var COMMA vars {printf("vars -> var COMMA vars\n");}
         ;
-var: IDENT {printf("IDENT\n");}
+var: IDENT {
+    printf("IDENT\n");
+    std::string temp;
+    std::string ident=$1.place;
+    if(functions.find(ident) == functions.end() && varTemp.find(ident)==varTemp.end()){
+        printf("Identifier %s is not declared.\n",ident.c_str());
+    }
+    else(if(arrSize[ident]>1){
+        printf("Did not provide index for array Identifier %s.\n". ident.c_str());
+    }
+    $$.code = strdup("");
+    $$.place=strdup(ident.c_str());
+    $$.arr = false;
+    }
     | IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET {printf("IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET");}
     ;
     
