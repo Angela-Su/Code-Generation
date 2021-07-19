@@ -54,3 +54,53 @@ std::string new_label();
 $right NOT
 
 %%
+
+Program:    %empty
+    {
+        if (!mainFunc){
+            printf("No main function was declared\n");
+        }
+    }
+    | Function Program
+    {
+    }
+    ;
+    
+Ident: IDENT
+    {
+        $$.place = strdup($1);
+        $$.code = strdup("");
+    }
+    ;
+
+Comp: EQ
+    {
+        $$.place = strdup("");
+        $$.code = strdup("== ");
+    }
+    | NEQ
+    {
+        $$.place = strdup(");
+        $$.code = strdup("!= ");
+    }
+    | LT
+    {
+        $$.place = strdup(");
+        $$.code = strdup("< ");
+    }
+    | LTE
+    {
+        $$.place = strdup(");
+        $$.code = strdup("<= ");
+    }
+    | GT
+    {
+        $$.place = strdup(");
+        $$.code = strdup("> ");
+    }
+    | GTE
+    {
+        $$.place = strdup(");
+        $$.code = strdup(">= ");
+    }
+    ;   
