@@ -128,27 +128,27 @@ Comp: EQ
     }
     | NEQ
     {
-        $$.place = strdup(");
+        $$.place = strdup("");
         $$.code = strdup("!= ");
     }
     | LT
     {
-        $$.place = strdup(");
+        $$.place = strdup("");
         $$.code = strdup("< ");
     }
     | LTE
     {
-        $$.place = strdup(");
+        $$.place = strdup("");
         $$.code = strdup("<= ");
     }
     | GT
     {
-        $$.place = strdup(");
+        $$.place = strdup("");
         $$.code = strdup("> ");
     }
     | GTE
     {
-        $$.place = strdup(");
+        $$.place = strdup("");
         $$.code = strdup(">= ");
     }
     ;   
