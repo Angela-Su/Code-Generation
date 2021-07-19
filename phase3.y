@@ -104,3 +104,25 @@ Comp: EQ
         $$.code = strdup(">= ");
     }
     ;   
+
+%%
+void yyerror(const char* s)
+{
+    extern int yylineno;
+    extern char **yytext;
+
+        printf("%s on line %d at char %d at symbol \"%s\"\n", s, yylineno, num_columns, yytext);
+        exit(1);
+}
+
+std::string new_temp(){
+    std::string t = "t" + std::to_string(tempCount);
+    tempCount++;
+    return t;
+}
+
+std::string new_label(){
+    std::string l = " L" + std::to_string(labelCount);
+    labelCount++;
+    return l;
+}
