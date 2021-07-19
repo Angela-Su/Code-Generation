@@ -44,13 +44,51 @@ std::string new_label();
 
 prog_start: functions { printf("prog_start -> functions\n");}
         ;
-
+Program:    %empty
+    {
+        if (!mainFunc){
+            printf("No main function was declared\n");
+        }
+    }
+    | Function Program
+    {
+    }
+    ;
 functions: /*empty*/{printf("functions -> epsilon\n");}
             | function functions {printf("functions -> function functions\n");}
         ;
 function: FUNCTION IDENT SEMICOLON BEGINPARAMS declarations ENDPARAMS BEGINLOCALS declarations ENDLOCALS BEGINBODY statements ENDBODY
-            {printf("function -> FUNCTION IDENT SEMICOLON BEGINPARAMS declarations ENDPARAMS BEGINLOCALS declarations ENDLOCALS BEGIN BODY statements ENDBODY\n");}
-        ;
+        {
+        std::string temp = "func ";
+        temp.append($2.place);
+        temp.append("\n");
+        std::string s = $2.place;
+        if( s == "main"){
+            mainFunc = true;
+        }
+        temp.append($5.code);
+        std::string decs = $5.code;
+        int decNum = 0;
+        while(decs.find(".") != std::string::npos){
+            int pos = decs.find(".");
+            decs.replace(pos, 1, "=");
+            std::string part = ", $" + std::to_string(decNum) + "\n";
+            decNum++;
+            decs.replace(decs.find("\n", pos), 1, part);
+        }
+        temp.append(decs);
+
+        temp.append($8.code);
+        std::string statements = $11.code;
+        if(statements.find("continue") != std::string::npos){
+            printf("Error: Continue outside loop in function %s\n", $2.place);
+        }
+        temp.append(statements);
+        temp.append("endfunc\n\n");
+        printf(temp.c_str());
+    }
+    ;
+        
 
 declarations: /*empty*/{
                 /*printf("declarations -> epsilon\n");*/
@@ -105,13 +143,62 @@ relation_expr:      expression comp expression {printf("relation_expr -> express
             | L_PAREN bool_expr R_PAREN {printf("relation_expr -> L_PAREN bool_expr R_PAREN\n");}
             | NOT L_PAREN bool_expr R_PAREN {printf("relation_expr -> NOT L_PAREN bool_expr R_PAREN\n");}
             ;
-comp: EQ {printf("comp -> EQ\n");}
-    | NEQ {printf("comp -> NEQ\n");}
-    | LT {printf("comp -> LT\n");}
-    | GT {printf("comp -> GT\n");}
-    | LTE {printf("comp -> LTE\n");}
-    | GTE {printf("comp -> GTE\n");}
+
+Ident: IDENT
+    {
+        $$.place = strdup($1);
+        $$.code = strdup("");
+    }
     ;
+    
+Idents: Ident
+    {
+        $$.place = strdup($1);
+        $$.code = strdup("");
+    }
+    | Ident COMMA Idents
+    {
+        std::string temp;
+        temp.append($1.place);
+        temp.append("|");
+        temp.append($3.place);
+        $$.place = strdup(temp.c_str());
+        $$.code = strdup("");
+    }
+    ; 
+
+Comp: EQ
+    {
+        $$.place = strdup("");
+        $$.code = strdup("== ");
+    }
+    | NEQ
+    {
+        $$.place = strdup("");
+        $$.code = strdup("!= ");
+    }
+    | LT
+    {
+        $$.place = strdup("");
+        $$.code = strdup("< ");
+    }
+    | LTE
+    {
+        $$.place = strdup("");
+        $$.code = strdup("<= ");
+    }
+    | GT
+    {
+        $$.place = strdup("");
+        $$.code = strdup("> ");
+    }
+    | GTE
+    {
+        $$.place = strdup("");
+        $$.code = strdup(">= ");
+    }
+    ;   
+
 expressions: expression COMMA expressions {printf("expressions -> expression COMMA expressions\n");}
             | expression {printf("expressions-> expression\n");}
             ;
@@ -150,14 +237,39 @@ var: IDENT {
     $$.place=strdup(ident.c_str());
     $$.arr = false;
     }
-    | IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET {printf("IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET");}
+    | IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET {
+        std::string temp;
+        std::string ident = $1.place;
+        if(funcs.find(ident) == funcs.end() && varTemp.find(indent) == varTemp.end()){
+            printf("Identifier %s is not declared.\n", ident.c_str());
+        }
+        else if(arrSize[ident] == 1){
+            printf("Provided index for non-array Identifier %s.\n", ident.c_str());
+        }
+        temp.append($1.code);
+        temp.append(", ");
+        temp.append($3.place);
+        $$.code = strdup($3.code);
+        $$.place = strdup(temp.c_str());
+        $$.arr = true;
+    }
     ;
     
 %%
 
+void yyerror(const char* s)
+{
+    extern int yylineno;
+    extern char **yytext;
+
+        printf("%s on line %d at char %d at symbol \"%s\"\n", s, yylineno, num_columns, yytext);
+        exit(1);
+}
+
+
 std:string new_temp(){
     std::string t= "t" + std::to_string(tempCount);
-    tempCount++
+    tempCount++;
     return t;
 }
 
