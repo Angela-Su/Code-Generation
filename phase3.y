@@ -178,7 +178,7 @@ Var: IDENT
             printf("Provided index for non-array Identifier %s.\n", ident.c_str());
         }
         temp.append($1.code);
-        temp.append(", ")'
+        temp.append(", ");
         temp.append($3.place);
         $$.code = strdup($3.code);
         $$.place = strdup(temp.c_str());
