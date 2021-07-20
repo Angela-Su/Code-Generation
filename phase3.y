@@ -197,7 +197,20 @@ Declaration: IDENT COLON INTEGER
         $$.place = strdup("");
     }
     ;
- 
+   
+statements: statement SEMICOLON statements
+    {
+        std::string temp;
+        temp.append($1.code);
+        temp.append($3.code);
+        $$.code = strdup(temp.c_str());
+    }
+    | statement SEMICOLON
+    {
+        $$.code = strdup($1.code);
+    }
+    ;
+
 Ident: IDENT
     {
         $$.place = strdup($1);
