@@ -210,6 +210,147 @@ statements: statement SEMICOLON statements
         $$.code = strdup($1.code);
     }
     ;
+   
+statement: var ASSIGN expression
+    {
+        std::string temp;
+        temp.append($1.code);
+        temp.append($3.code);
+        std::string mid = $3.place;
+        if($1.arr && $3.arr){
+            temp += "[]= ";
+        }
+        else if($1.arr){
+            temp += "[]= ";
+        }
+        else if($3.arr){
+            temp += "[]= ";
+        }
+        else{
+            temp += "= ";
+        }
+        temp.append($1.place);
+        temp.append(", ");
+        temp.append(mid);
+        temp += "\n";
+        $$.code = strdup(temp.c_str());
+    }
+    | IF bool_expr THEN statements ENDIF
+    {
+        std::string s1 = new_label();
+        std::string s2 = new_label();
+        std::string temp;
+        temp.append($2.code);
+        temp = temp + "?:= " + s1 + ", " + $2.place + "\n";
+        temp = temp + ":= " + s2 + "\n";
+        temp = temp + ": " + s1 + "\n";
+        temp.append($4.code);
+        temp = temp + ": " + s2 + "\n";
+        $$.code = strdup(temp.c_str());
+    }
+    | IF  bool_expr THEN statements ELSE statements ENDIF
+    {
+        std::string s1 = new_label();
+        std::string s2 = new_label();
+        std::string temp;
+        temp.append($2.code);
+        temp = temp + "?:= " + s1 + ", " + $2.place + "\n";
+        temp.append($6.code);
+        temp = temp + ":= " + s2 + "\n";
+        temp = temp + ": " + s1 + "\n";
+        temp.append($4.code);
+        temp = temp + ": " + s2 + "\n";
+        $$.code = strdup(temp.c_str());
+    }
+    |  WHILE bool_expr BEGINLOOP statements ENDIF
+    {
+        std::string s1 = new_label();
+        std::string s2 = new_label();
+        std::string s3 = new_label();
+        std::string temp = $4.code;
+        std::string temp2;
+        size_t pos = temp.find("continue");
+        while(pos != std::string::npos){
+            temp.replace(pos, 8, ":= " + s1);
+            pos = temp.find("continue");
+        }
+
+        temp2.append(": ");
+        temp2 += s1 + "\n";
+        temp2.append($2.code);
+        temp2 += "?:= " + s2 + ", ";
+
+        temp2.append($2.place);
+        temp2.append("\n");
+        temp2 += ":= " + s3 + "\n";
+        temp2 += ": " + s2 + "\n";
+        temp2.append(temp);
+        temp2 += ":= " + s1 + "\n";
+        temp2 += ": " + s2 + "\n";
+        $$.code = strdup(temp2.c_str());
+    }
+    | DO BEGINLOOP statements ENDLOOP WHILE bool_expr
+    {
+        std::string s1 = new_label();
+        std::string s2 = new_label();
+        std::string temp = $3.code;
+        std::string temp2;
+        size_t pos = temp.find("continue");
+        while(pos != std::string::npos){
+            temp.replace(pos, 8, ":= " + s2);
+            pos = temp.find("continue");
+        }
+        temp2.append(": ");
+        temp2 += begin + "\n";
+        temp2.append(temp);
+        temp2 += ": " + s2 + "\n";
+        temp2.append($6.code);
+        temp2 += "?:= " + s1 + ", ";
+        temp2.append($6.place);
+        temp2.append("\n");
+        $$.code = strdup(temp.c_str());
+    }
+    | FOR vars ASSIGN NUMBER SEMICOLON bool_expr SEMICOLON vars ASSIGN expression BEGINLOOP statements ENDLOOP
+    {
+
+    }
+    | READ vars
+    {
+        std::string temp;
+        temp.append($2.code);
+        size_t pos = temp.find("|", 0);
+        while(pos != std::string::npos) {
+            temp.replace(pos, 1, "<");
+            pos = temp.find("|", pos);
+        }
+        $$.code = strdup(temp.c_str());
+    }
+    | WRITE vars
+    {
+        std::string temp;
+        temp.append($2.code);
+        size_t pos = temp.find("|", 0);
+
+        while(pos != std::string::npos) {
+            temp.replace(pos, 1, ">");
+            pos = temp.find("|", pos);
+        }
+        $$.code = strdup(temp.c_str());
+    }
+    | CONTINUE
+    {
+        $$.code = strdup("continue\n");
+    }
+    | RETURN expression
+    {
+        std::string temp;
+        temp.append($2.code);
+        temp.append("ret ");
+        temp.append($2.place);
+        temp.append("\n");
+        $$.code = strdup(temp.c_str());
+    }
+    ;   
 
 Ident: IDENT
     {
