@@ -239,6 +239,38 @@ Comp: EQ
     }
     ;   
 
+Vars: var
+    {
+        std::string temp;
+        temp.append($1.code);
+        if($1.arr){
+            temp.append(".[]| ");
+        }
+        else{
+            temp.append(".| ");
+        }
+        temp.append($1.place);
+        temp.append("\n");
+        $$.code = strdup(temp.c_str());
+        $$.place = strdup("");
+    }
+    | var COMMA vars
+    {
+        std::string temp;
+        temp.append($1.code);
+        if($1.arr){
+            temp.append(".[]| ");
+        }
+        else{
+            temp.append(".| ");
+        }
+        temp.append($1.place);
+        temp.append("\n");
+        temp.append($3.place);
+        $$.code = strdup(temp.c_str());
+        $$.place = strdup("");
+    };
+
 Var: IDENT
     {
         std::string temp;
