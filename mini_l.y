@@ -218,9 +218,27 @@ Comp: EQ
     }
     ;   
 
-expressions: expression COMMA expressions {printf("expressions -> expression COMMA expressions\n");}
-            | expression {printf("expressions-> expression\n");}
+expressions: expression COMMA expressions 
+            {
+                std::string temp;
+                temp.append($1.code);
+                temp.append("param ");
+                te,p.append($1.place);
+                temp.append("\n");
+                temp.append($3.code);   /* I think this is sufficient, but not totally sure*/
+                $$.code=strdup(temp.c_str());
+                $$.place=strdup(temp.c_str());
+            }
+            | expression {
+                std::string temp;
+                temp.append("param ");
+                temp.append($1.place);
+                temp.append("\n");
+                $$.code=strdup(temp.c_str());
+                $$.place=strdup(temp.c_str());
+            }
             ;
+
 expression: multiplicative-expr {printf("expression -> multiplicative-expr\n");}
             | multiplicative-expr ADD multiplicative-expr {
                 std::string temp;
@@ -254,12 +272,12 @@ expression: multiplicative-expr {printf("expression -> multiplicative-expr\n");}
             }
             ;
 multiplicative-expr: term {
-                    std::string temp;
+                    /*std::string temp;
                     std::string dst=new_temp();
                     temp.append($1.code);
-                    temp.append($1.place);
-                    $$.code = strdup(temp.c_str());
-                    $$.place = strdup(temp.c_str()); /*went freeballing here, might need fixing*/
+                    temp.append($1.place);*/
+                    $$.code = strdup($1.code);
+                    $$.place = strdup($1.place); /*went freeballing here, might need fixing*/
                     }
                     | term MULT multiplicative-expr {
                         std::string temp;
