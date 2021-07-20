@@ -142,6 +142,70 @@ Bool_expr: relation_and_expr
         $$.place = strdup(dst.c_str());
     }
     ;
+    
+    Relation_and_expr: Relation_expr_inv and Relation_and_expr
+    {
+        std::string dst = new_temp();
+        std::string temp;
+        temp.append($1.code);
+        temp.append($3.code);
+        temp += ". " + dst + "\n" + "&& " + dst + ", " + $1.place + ", " + $3.place + "\n";
+        $$.code = strdup(temp.c_str());
+        $$.place = strdup(dst.c_str());
+    }
+    | Relation_expr_inv
+    {
+        $$.code = strdup($1.code);
+        $$.place = strdup($1.place);
+    }
+    ;
+
+Relation_expr_inv: NOT Relation_expr_inv
+    {
+        std::string dst = new_temp();
+        std::string temp;
+        temp.append($2.code);
+        temp += ". " + dst + "\n" + "! " + dst + ", " + $2.place + "\n";
+        $$.code = strdup(temp.c_str());
+        $$.place = strdup(dst.c_str());
+    }
+    | Relation_expr
+    {
+        $$.code = strdup($1.code);
+        $$.place = strdup($1.place);
+    }
+    ;
+
+Relation_expr: expression comp expression
+    {
+        std::string dst = new_temp();
+        std::string temp;
+        temp.append($1.code);
+        temp.append($3.code);
+        temp += ". " + dst + "\n" + $2.place + dst + ", " + $1.place + ", " + $3.place + "\n";
+        $$.code = strdup(temp.c_str());
+        $$.place = strdup(dst.c_str());
+    }
+    | TRUE
+    {
+        std::string temp;
+        temp.append("1");
+        $$.code = strdup("");
+        $$.place = strdup(temp.c_str());
+    }
+    | FALSE
+    {
+        std::string temp;
+        temp.append("0");
+        $$.code = strdup("");
+        $$.place = strdup(temp.c_str());
+    }
+    | L_PAREN bool_expr R_PAREN
+    {
+        $$.code = strdup($2.code);
+        $$.place = strdup($2.place);
+    }
+    ;
 
 Comp: EQ
     {
