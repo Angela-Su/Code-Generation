@@ -98,6 +98,106 @@ Function: FUNCTION FuncIdent SEMICOLON BEGINPARAMS declarations ENDPARAMS BEGINL
     }
     ;    
  
+Declaration: IDENT COLON INTEGER
+    {
+        int left = 0;
+        int right = 0;
+        std::string parse($1.place);
+        std::string temp;
+        bool ex = false;
+        while(!ex){
+            right = parse.find("|", left);
+            temp.append(".");
+            if(right == std::string::npos){
+                std::string ident = parse.substr(left, right);
+                if(reserved.find(ident) != reserved.end()){
+                    printf("Identifier %s's name is a reserved word, can't be used.\n", ident.c_str());
+                }
+                if(funcs.find(ident) != funcs.end() || varTemp.find(ident) != varTemp.end()){
+                    printf("Identifier %s is previously declared.\n", ident.c_str());
+                }
+                else{
+                    varTemp[ident] = ident;
+                    arrSize[ident] = 1;
+                }
+                temp.append(ident);
+                ex = true;
+            }
+            else{
+                std::string ident = parse.substr(left, right - left);
+                if(reserved.find(ident) != reserved.end()){
+                    printf("Identifier %s's name is a reserved word, can't be used.\n", ident.c_str());
+                }
+                if(funcs.find(ident) != funcs.end() || varTemp.find(ident) != varTemp.end()){
+                    printf("Identifier %s is previously declared.\n", ident.c_str());
+                }
+                else{
+                    varTemp[ident] = ident;
+                    arrSize[ident] = 1;
+                }
+                temp.append(ident);
+                left = right + 1;
+            }
+            temp.append("\n");
+        }
+        $$.code = strdup(temp.c_str());
+        $$.place = strdup("");
+    }
+    | IDENT COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
+    {
+        size_t left = 0;
+        size_t right = 0;
+        std::string parse($1.place);
+        std::string temp;
+        bool ex = false;
+        while(!ex){
+            right = parse.find("|", left);
+            temp.append(".[]");
+            if(right == std::string::npos){
+                std::string ident = parse.substr(left, right);
+                if(reserved.find(ident) != reserved.end()){
+                    printf("Identifier %s's name is a reserved word, can't be used.\n", ident.c_str());
+                }
+                if(funcs.find(ident) != funcs.end() || varTemp.find(ident) != varTemp.end()){
+                    printf("Identifier %s is previously declared.\n", ident.c_str());
+                }
+                else{
+                    if($5 <= 0){
+                        printf("Declaring array ident %s of size <= 0.\n", ident.c_str());
+                    }
+                    varTemp[ident] = ident;
+                    arrSize[ident] = $5;
+                }
+                temp.append(ident);
+                ex = true;
+            }
+            else{
+                std::string ident = parse.substr(left, right - left);
+                if(reserved.find(ident) != reserved.end()){
+                    printf("Identifier %s's name is a reserved word, can't be used.\n", ident.c_str());
+                }
+                if(funcs.find(ident) != funcs.end() || varTemp.find(ident) != varTemp.end()){
+                    printf("Identifier %s is previously declared.\n", ident.c_str());
+                }
+                else{
+                    if($5 <= 0){
+                        printf("Declaring array ident %s of size <= 0.\n", ident.c_str());
+                    }
+                    varTemp[ident] = ident;
+                    arrSize[ident] = $5;
+                }
+                temp.append(ident);
+                left = right + 1;
+            }
+            temp.append(", ");
+            temp.append(std::to_string($5));
+            temp.append("\n");
+        }
+        $$.code = strdup(temp.c_str());
+        $$.place = strdup("");
+    }
+    ;
+ 
 Ident: IDENT
     {
         $$.place = strdup($1);
