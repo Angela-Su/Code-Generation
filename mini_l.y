@@ -222,7 +222,21 @@ expressions: expression COMMA expressions {printf("expressions -> expression COM
             | expression {printf("expressions-> expression\n");}
             ;
 expression: multiplicative-expr {printf("expression -> multiplicative-expr\n");}
-            | multiplicative-expr ADD multiplicative-expr {printf("expression -> multiplicative-expr ADD multiplicative-expr\n");}
+            | multiplicative-expr ADD multiplicative-expr {
+                std::string temp;
+                std::string dst= new_temp();
+                temp.append($1.code);
+                temp.append($3.code);
+                temp+=". " + dst + "\n";
+                temp+= "+ " + dst + ", ";
+                temp.append($1.place);
+                temp+=", ";
+                temp.append($3.place);
+                temp+="\n";
+                $$.code = strdup(temp.c_str());
+                $$.place = strdup(dst.c_str());
+
+            }
             | multiplicative-expr SUB multiplicative-expr {printf("expression -> multiplicative-expr SUB multiplicative-expr\n");}
             ;
 multiplicative-expr: term {
