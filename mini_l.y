@@ -29,7 +29,7 @@ std::string new_label();
     char* id_val;
 }
 %error-verbose
-%start prog_start
+%start Program
 %token FUNCTION BEGINPARAMS ENDPARAMS BEGINLOCALS ENDLOCALS BEGINBODY ENDBODY INTEGER ARRAY ENUM OF IF THEN ENDIF ELSE WHILE FOR DO BEGINLOOP ENDLOOP CONTINUE READ WRITE TRUE FALSE SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN RETURN
 %token <id_val> IDENT
 %token <num_val> NUMBER
@@ -44,19 +44,19 @@ std::string new_label();
 
 /*prog_start: functions { printf("prog_start -> functions\n");}
         ;*/
+
+/*99% of our errors are for the same reason. The $ isn't recognized, something about having "no delcared type". <--------------------------------------*/
 Program:    %empty
     {
         if (!mainFunc){
             printf("No main function was declared\n");
         }
     }
-    | Function Program
+    | function Program
     {
     }
     ;
-functions: /*empty*/{printf("functions -> epsilon\n");}
-            | function functions {printf("functions -> function functions\n");}
-        ;
+
 function: FUNCTION IDENT SEMICOLON BEGINPARAMS declarations ENDPARAMS BEGINLOCALS declarations ENDLOCALS BEGINBODY statements ENDBODY
         {
         std::string temp = "func ";
@@ -90,7 +90,7 @@ function: FUNCTION IDENT SEMICOLON BEGINPARAMS declarations ENDPARAMS BEGINLOCAL
     ;
         
 
-declarations: /*empty*/{
+declarations: /*empty*/{ /* might need %empty*/
                 /*printf("declarations -> epsilon\n");*/
                 $$.place = strdup("");
                 $$.code = strdup("");
@@ -105,7 +105,7 @@ declarations: /*empty*/{
                 }
             ;
 
-Declaration: IDENT COLON INTEGER
+declaration: IDENT COLON INTEGER
     {
         int left = 0;
         int right = 0;
@@ -344,7 +344,7 @@ statement: var ASSIGN expression
         temp+="\n ";
         temp+=": " +condition+ "\n";
         temp.append($6.code);
-        temp += "?:= ?+inner + ", ";
+        temp += "?:= "+inner + ", ";
         temp.append($6.place);
         temp.append("\n");
         temp +=":= "+after+"\n";
@@ -362,8 +362,6 @@ statement: var ASSIGN expression
         temp.append($10.place);
         /*feel unsure here*/
         $$.code = strdup(temp.c_str());
-        
-        }
     }
     | READ vars
     {
@@ -403,7 +401,7 @@ statement: var ASSIGN expression
     }
     ;   
         
-Bool_expr: relation_and_expr
+bool_expr: relation_and_expr
     {
         $$.code = strdup($1.code);
         $$.place = strdup(1.place);
@@ -426,7 +424,7 @@ Bool_expr: relation_and_expr
     ;
 
 
-Relation_and_expr: Relation_expr_inv and Relation_and_expr
+relation_and_expr: relation_expr_inv AND relation_and_expr
     {
         std::string dst = new_temp();
         std::string temp;
@@ -436,14 +434,14 @@ Relation_and_expr: Relation_expr_inv and Relation_and_expr
         $$.code = strdup(temp.c_str());
         $$.place = strdup(dst.c_str());
     }
-    | Relation_expr_inv
+    | relation_expr_inv
     {
         $$.code = strdup($1.code);
         $$.place = strdup($1.place);
     }
     ;
     
-Relation_expr_inv: NOT Relation_expr_inv
+relation_expr_inv: NOT relation_expr_inv
     {
         std::string dst = new_temp();
         std::string temp;
@@ -452,13 +450,13 @@ Relation_expr_inv: NOT Relation_expr_inv
         $$.code = strdup(temp.c_str());
         $$.place = strdup(dst.c_str());
     }
-    | Relation_expr
+    | relation_expr
     {
         $$.code = strdup($1.code);
         $$.place = strdup($1.place);
     }
     ;
-Relation_expr: expression comp expression
+relation_expr: expression comp expression
     {
         std::string dst = new_temp();
         std::string temp;
@@ -512,7 +510,7 @@ Idents: Ident
     }
     ; 
 
-Comp: EQ
+comp: EQ
     {
         $$.place = strdup("");
         $$.code = strdup("== ");
@@ -601,7 +599,7 @@ multiplicative-expr: term {
                     std::string temp;
                     temp.append($1.code);
                     temp.append($1.place);
-                    temp.append($"\n");
+                    temp.append("\n");
                     $$.code = strdup(temp.c_string());
                     $$.place = strdup(""); /*went freeballing here, might need fixing*/
                     }
