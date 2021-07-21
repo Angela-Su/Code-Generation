@@ -1,8 +1,8 @@
 /*Westin Montano & Angela Su worked together on the following code*/
 
 %{  
-    #include "y.tab.h"
-    int num_lines = 1, num_columns = 1; 
+    #include "mini_l.tab.h"
+    int num_lines = 1, num_columns = 0; 
 %}
 
 DIGIT   [0-9]
@@ -76,8 +76,16 @@ E_ID_1  [0-9_][a-zA-Z0-9_]*
 ":="            {return ASSIGN;num_columns+=yyleng;}
 [ ]             num_columns++;
 \t              num_columns+=4;
-\n           {num_lines++; num_columns = 1;}
+"\n"           {num_lines++; num_columns = 0;}
 "##"[^\n]*"\n"  num_lines++; num_columns = 1;
 
 
 .               {printf("Error at line $d, column %d: unrecognized symbol \"%s\"\n", num_lines, num_columns, yytext); exit(-1);}
+
+int main(int argc, char ** argv)
+{
+  //yylex();
+  yyparse();
+  
+  return 0;
+}
