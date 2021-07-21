@@ -42,7 +42,7 @@ std::string new_label();
 %token FUNCTION BEGINPARAMS ENDPARAMS BEGINLOCALS ENDLOCALS BEGINBODY ENDBODY INTEGER ARRAY ENUM OF IF THEN ENDIF ELSE WHILE FOR DO BEGINLOOP ENDLOOP CONTINUE READ WRITE TRUE FALSE SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN RETURN
 %token <id_val> IDENT
 %token <num_val> NUMBER
-%type <expression> function declarations declaration vars var expressions expression Ident 
+%type <expression> function declarations declaration vars var expressions expression Ident FuncIdent
 %type <expression> bool_expr relation_and_expr relation_expr_inv relation_expr comp multiplicative-expr term
 %type <statement> statements statement
 %right ASSIGN
@@ -69,7 +69,7 @@ Program:    %empty
     }
     ;
 
-function: FUNCTION IDENT SEMICOLON BEGINPARAMS declarations ENDPARAMS BEGINLOCALS declarations ENDLOCALS BEGINBODY statements ENDBODY
+function: FUNCTION FuncIdent SEMICOLON BEGINPARAMS declarations ENDPARAMS BEGINLOCALS declarations ENDLOCALS BEGINBODY statements ENDBODY
         {
         std::string temp = "func ";
         temp.append($2.place);
@@ -117,7 +117,7 @@ declarations: %empty{
                 }
             ;
 
-declaration: IDENT COLON INTEGER
+declaration: Ident COLON INTEGER
     {
         int left = 0;
         int right = 0;
@@ -162,7 +162,7 @@ declaration: IDENT COLON INTEGER
         $$.code = strdup(temp.c_str());
         $$.place = strdup("");
     }
-    | IDENT COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
+    | Ident COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
     {
         size_t left = 0;
         size_t right = 0;
@@ -522,6 +522,19 @@ Ident: IDENT
     }
     ; */
 
+FuncIdent: IDENT
+    {
+        if (funcs.find($1) != funcs.end()){
+            printf("function name %s already declared.\n", $1);
+        }
+        else{
+            funcs.insert($1);
+        }
+    $$.place = strdup($1);
+    $$.code = strdup("");
+    }
+    ;
+
 comp: EQ
     {
         $$.place = strdup("");
@@ -760,7 +773,7 @@ term: SUB var
         $$.place = strdup($2.place);
     }
     /*| IDENT L_PAREN expression R_PAREN {printf("term -> IDENT L_PAREN expression R_PAREN\n");} Dont think this is needed*/
-    | IDENT L_PAREN expressions R_PAREN {
+    | Ident L_PAREN expressions R_PAREN {
         std::string temp;
         std::string func = $1.place;
         if(funcs.find(func)==funcs.end()){
