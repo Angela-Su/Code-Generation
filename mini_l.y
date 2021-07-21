@@ -105,27 +105,303 @@ declarations: /*empty*/{
                 }
             ;
 
-declaration:        IDENT COLON INTEGER {printf("declaration -> IDENT COLON INTEGER\n");}
-            | IDENT COMMA IDENT COLON INTEGER {printf("declaration -> IDENT COMMA IDENT COLON INTEGER\n");}
-            | IDENT COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER {printf("declaration -> IDENT COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER\n");}
-            | IDENT COMMA IDENT COLON L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER {printf("declaration -> IDENT COMMA IDENT COLON L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER\n");}        
-        ;
+Declaration: IDENT COLON INTEGER
+    {
+        int left = 0;
+        int right = 0;
+        std::string parse($1.place);
+        std::string temp;
+        bool ex = false;
+        while(!ex){
+            right = parse.find("|", left);
+            temp.append(".");
+            if(right == std::string::npos){
+                std::string ident = parse.substr(left, right);
+                if(reserved.find(ident) != reserved.end()){
+                    printf("Identifier %s's name is a reserved word, can't be used.\n", ident.c_str());
+                }
+                if(funcs.find(ident) != funcs.end() || varTemp.find(ident) != varTemp.end()){
+                    printf("Identifier %s is previously declared.\n", ident.c_str());
+                }
+                else{
+                    varTemp[ident] = ident;
+                    arrSize[ident] = 1;
+                }
+                temp.append(ident);
+                ex = true;
+            }
+            else{
+                std::string ident = parse.substr(left, right - left);
+                if(reserved.find(ident) != reserved.end()){
+                    printf("Identifier %s's name is a reserved word, can't be used.\n", ident.c_str());
+                }
+                if(funcs.find(ident) != funcs.end() || varTemp.find(ident) != varTemp.end()){
+                    printf("Identifier %s is previously declared.\n", ident.c_str());
+                }
+                else{
+                    varTemp[ident] = ident;
+                    arrSize[ident] = 1;
+                }
+                temp.append(ident);
+                left = right + 1;
+            }
+            temp.append("\n");
+        }
+        $$.code = strdup(temp.c_str());
+        $$.place = strdup("");
+    }
+    | IDENT COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
+    {
+        size_t left = 0;
+        size_t right = 0;
+        std::string parse($1.place);
+        std::string temp;
+        bool ex = false;
+        while(!ex){
+            right = parse.find("|", left);
+            temp.append(".[]");
+            if(right == std::string::npos){
+                std::string ident = parse.substr(left, right);
+                if(reserved.find(ident) != reserved.end()){
+                    printf("Identifier %s's name is a reserved word, can't be used.\n", ident.c_str());
+                }
+                if(funcs.find(ident) != funcs.end() || varTemp.find(ident) != varTemp.end()){
+                    printf("Identifier %s is previously declared.\n", ident.c_str());
+                }
+                else{
+                    if($5 <= 0){
+                        printf("Declaring array ident %s of size <= 0.\n", ident.c_str());
+                    }
+                    varTemp[ident] = ident;
+                    arrSize[ident] = $5;
+                }
+                temp.append(ident);
+                ex = true;
+            }
+            else{
+                std::string ident = parse.substr(left, right - left);
+                if(reserved.find(ident) != reserved.end()){
+                    printf("Identifier %s's name is a reserved word, can't be used.\n", ident.c_str());
+                }
+                if(funcs.find(ident) != funcs.end() || varTemp.find(ident) != varTemp.end()){
+                    printf("Identifier %s is previously declared.\n", ident.c_str());
+                }
+                else{
+                    if($5 <= 0){
+                        printf("Declaring array ident %s of size <= 0.\n", ident.c_str());
+                    }
+                    varTemp[ident] = ident;
+                    arrSize[ident] = $5;
+                }
+                temp.append(ident);
+                left = right + 1;
+            }
+            temp.append(", ");
+            temp.append(std::to_string($5));
+            temp.append("\n");
+        }
+        $$.code = strdup(temp.c_str());
+        $$.place = strdup("");
+    }
+    ;
         
-statements: /*empty*/ {printf("statements -> epsilon\n");}
-            | statement SEMICOLON statements {printf("statements -> statement SEMICOLON statements\n");}
-        ;
+statements: statement SEMICOLON statements
+    {
+        std::string temp;
+        temp.append($1.code);
+        temp.append($3.code);
+        $$.code = strdup(temp.c_str());
+    }
+    | statement SEMICOLON
+    {
+        $$.code = strdup($1.code);
+    }
+    ;
         
-statement: var ASSIGN expression { printf("statement -> var ASSIGN expression\n");}
-            | IF bool_expr THEN statements ENDIF {printf("statement -> IF bool_expr THEN statements ENDIF\n");}
-            | IF  bool_expr THEN statements ELSE statements ENDIF { printf("statement -> IF bool_expr THEN statements ELSE statements ENDIF\n");}
-            | WHILE bool_expr BEGINLOOP statements ENDIF {printf("statement -> WHILE bool_expr BEGINLOOP statements ENDIF\n");}
-            | DO BEGINLOOP statements ENDLOOP WHILE bool_expr {printf("statement -> DO BEGINLOOP statements ENDLOOP WHILE bool_expr\n");}
-            | FOR vars ASSIGN NUMBER SEMICOLON bool_expr SEMICOLON vars ASSIGN expression BEGINLOOP statements ENDLOOP {printf("statement -> FOR vars ASSIGN NUMBER SEMICOLON bool_expr SEMICOLON vars ASSIGN expression BEGINLOOP statements ENDLOOP");}
-            | READ vars { printf("statement -> READ vars\n");}
-            | WRITE vars { printf("statement -> WRITE vars\n");}
-            | CONTINUE { printf("statement -> CONTINUE\n");}
-            | RETURN expression {printf("statement -> RETURN expression\n");}
-        ;
+statement: var ASSIGN expression
+    {
+        std::string temp;
+        temp.append($1.code);
+        temp.append($3.code);
+        std::string mid = $3.place;
+        if($1.arr && $3.arr){
+            temp += "[]= ";
+        }
+        else if($1.arr){
+            temp += "[]= ";
+        }
+        else if($3.arr){
+            temp += "[]= ";
+        }
+        else{
+            temp += "= ";
+        }
+        temp.append($1.place);
+        temp.append(", ");
+        temp.append(mid);
+        temp += "\n";
+        $$.code = strdup(temp.c_str());
+    }
+    | IF bool_expr THEN statements ENDIF
+    {
+        std::string s1 = new_label();
+        std::string s2 = new_label();
+        std::string temp;
+        temp.append($2.code);
+        temp = temp + "?:= " + s1 + ", " + $2.place + "\n";
+        temp = temp + ":= " + s2 + "\n";
+        temp = temp + ": " + s1 + "\n";
+        temp.append($4.code);
+        temp = temp + ": " + s2 + "\n";
+        $$.code = strdup(temp.c_str());
+    }
+    | IF  bool_expr THEN statements ELSE statements ENDIF
+    {
+        std::string s1 = new_label();
+        std::string s2 = new_label();
+        std::string temp;
+        temp.append($2.code);
+        temp = temp + "?:= " + s1 + ", " + $2.place + "\n";
+        temp.append($6.code);
+        temp = temp + ":= " + s2 + "\n";
+        temp = temp + ": " + s1 + "\n";
+        temp.append($4.code);
+        temp = temp + ": " + s2 + "\n";
+        $$.code = strdup(temp.c_str());
+    }
+    |  WHILE bool_expr BEGINLOOP statements ENDIF
+    {
+        std::string s1 = new_label();
+        std::string s2 = new_label();
+        std::string s3 = new_label();
+        std::string temp = $4.code;
+        std::string temp2;
+        size_t pos = temp.find("continue");
+        while(pos != std::string::npos){
+            temp.replace(pos, 8, ":= " + s1);
+            pos = temp.find("continue");
+        }
+
+        temp2.append(": ");
+        temp2 += s1 + "\n";
+        temp2.append($2.code);
+        temp2 += "?:= " + s2 + ", ";
+
+        temp2.append($2.place);
+        temp2.append("\n");
+        temp2 += ":= " + s3 + "\n";
+        temp2 += ": " + s2 + "\n";
+        temp2.append(temp);
+        temp2 += ":= " + s1 + "\n";
+        temp2 += ": " + s2 + "\n";
+        $$.code = strdup(temp2.c_str());
+    }
+    | DO BEGINLOOP statements ENDLOOP WHILE bool_expr
+    {
+        std::string s1 = new_label();
+        std::string s2 = new_label();
+        std::string temp = $3.code;
+        std::string temp2;
+        size_t pos = temp.find("continue");
+        while(pos != std::string::npos){
+            temp.replace(pos, 8, ":= " + s2);
+            pos = temp.find("continue");
+        }
+        temp2.append(": ");
+        temp2 += begin + "\n";
+        temp2.append(temp);
+        temp2 += ": " + s2 + "\n";
+        temp2.append($6.code);
+        temp2 += "?:= " + s1 + ", ";
+        temp2.append($6.place);
+        temp2.append("\n");
+        $$.code = strdup(temp.c_str());
+    }
+    | FOR vars ASSIGN NUMBER SEMICOLON bool_expr SEMICOLON vars ASSIGN expression BEGINLOOP statements ENDLOOP
+    {
+        std::string temp;
+        std::string dst=new_temp();
+        std::string condition = new_label();
+        std::string inner = new_label();
+        std::string after = new_label();
+        std::string code = $12.code;
+        size_t pos = code.find("continue");
+        while(pos!=std::string::npos){
+            code.replace(pos, $8, ":= "+increment);
+            pos= code.find("continue");
+        }
+        temp.append($2.code);
+        std::string mid = std::to_string($4);
+        if($2.arr){
+            temp+="[]= ";
+        }
+        else{
+            temp +="= ";
+        }
+        temp.append($2.place);
+        temp.append(", ");
+        temp.append(mid);
+        temp+="\n ";
+        temp+=": " +condition+ "\n";
+        temp.append($6.code);
+        temp += "?:= ?+inner + ", ";
+        temp.append($6.place);
+        temp.append("\n");
+        temp +=":= "+after+"\n";
+        temp +=": " + inner +"\n";
+        temp.append(code);
+        temp.append($10.code);
+        if($8.arr){
+            temp+="[]= ";
+        }
+        else{
+            temp+="= ";
+        }
+        temp.append($8.place);
+        temp.append(", ");
+        temp.append($10.place);
+        /*feel unsure here*/
+        $$.code = strdup(temp.c_str());
+        
+        }
+    }
+    | READ vars
+    {
+        std::string temp;
+        temp.append($2.code);
+        size_t pos = temp.find("|", 0);
+        while(pos != std::string::npos) {
+            temp.replace(pos, 1, "<");
+            pos = temp.find("|", pos);
+        }
+        $$.code = strdup(temp.c_str());
+    }
+    | WRITE vars
+    {
+        std::string temp;
+        temp.append($2.code);
+        size_t pos = temp.find("|", 0);
+
+        while(pos != std::string::npos) {
+            temp.replace(pos, 1, ">");
+            pos = temp.find("|", pos);
+        }
+        $$.code = strdup(temp.c_str());
+    }
+    | CONTINUE
+    {
+        $$.code = strdup("continue\n");
+    }
+    | RETURN expression
+    {
+        std::string temp;
+        temp.append($2.code);
+        temp.append("ret ");
+        temp.append($2.place);
+        temp.append("\n");
+        $$.code = strdup(temp.c_str());
+    }
+    ;   
         
 Bool_expr: relation_and_expr
     {
@@ -378,14 +654,95 @@ multiplicative-expr: term {
                         $$.place = strdup(dst.c_str());
                     }
                     ;
-term: SUB var {printf("term -> SUB var\n");}
-    | SUB NUMBER {printf("term -> SUB NUMBER\n");}
-    | SUB L_PAREN expression R_PAREN {printf("term -> SUB R_PAREN expression L_PAREN\n");}
-    | var {printf("term -> var\n");}
-    | NUMBER {printf("term -> NUMBER\n");}
-    | L_PAREN expression R_PAREN {printf("term -> R_PAREN expression L_PAREN\n");}
+
+term: SUB var 
+    {
+        $$.place = strdup(newTemp().c_str());
+        std::string temp;
+        temp.append($2.code);
+        temp.append(". ");
+        temp.append($$.place);
+        temp.append("\n");
+        if($2.array){
+            temp.append("=[] ");
+        }
+        else{
+            temp.append("= ");
+        }
+        temp.append($$.place);
+        temp.append(", ");
+        temp.append($2.place);
+        temp.append("\n");
+
+        $$.code = strdup(temp.c_str());
+        $$.place=strdup(temp.c_str());
+        $$.array = false;
+    }
+    | SUB NUMBER {
+        std::string dst = new_temp();
+        std::string temp;
+        temp.append(". ");
+        temp.append(dst);
+        temp.append("/n");
+        temp= temp + "= " + dst +", -" + std::to_string($2) + "\n";
+        $$.code = strdup(temp.c_str());
+        $$.place = strdup(dst.c_str());
+    }
+    | SUB L_PAREN expression R_PAREN {
+        $$.code = strdup($2.code);
+        $$.place = strdup($2.place);
+    }
+    | var {
+        if($$.array){
+            std::string temp;
+            std::string interm = new_temp();
+            temp.append($1.code);
+            temp.append(". ");
+            temp.append(interm);
+            temp.append("\n");
+            temp.append("=[] ");
+            temp.append(interm);
+            temp.append(", ");
+            temp.append($1.place);
+            temp.append("\n");
+            $$.code = strdup(temp.c_str());
+            $$.place = strdup(interm.c_str());
+            $$.array = false;
+        }
+        else{
+            $$.code = strdup($1.code);
+            $$.place = strdup($1.place);
+        }
+    }
+    | NUMBER {
+        std::string dst = new_temp();
+        std::string temp;
+        temp.append(". ");
+        temp.append(dst);
+        temp.append("/n");
+        temp= temp + "= " + dst +", " + std::to_string($1) + "\n";
+        $$.code = strdup(temp.c_str());
+        $$.place = strdup(dst.c_str());
+    }
+    | L_PAREN expression R_PAREN {
+        $$.code = strdup($2.code);
+        $$.place = strdup($2.place);
+    }
     /*| IDENT L_PAREN expression R_PAREN {printf("term -> IDENT L_PAREN expression R_PAREN\n");} Dont think this is needed*/
-    | IDENT L_PAREN expressions R_PAREN {printf("term -> IDENT L_PAREN expressions R_PAREN\n");}
+    | IDENT L_PAREN expressions R_PAREN {
+        std::string temp;
+        std::string func = $1.place;
+        if(funcs.find(func)==funcs.end()){
+            printf("Calling undeclared function %s.\n", func.c_str());
+        }
+        std::string dst= new_temp();
+        temp.append($3.code);
+        temp+=". " + dst +"\ncall ";
+        temp.append($1.place);
+        temp += ", " + dst + "\n";
+        $$.code = strdup(temp.c_str());
+        $$.place = strdup(dst.c_str());
+    }
     ;
 Vars: var
     {
