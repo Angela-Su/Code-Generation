@@ -33,6 +33,9 @@ std::string new_label();
 %token FUNCTION BEGINPARAMS ENDPARAMS BEGINLOCALS ENDLOCALS BEGINBODY ENDBODY INTEGER ARRAY ENUM OF IF THEN ENDIF ELSE WHILE FOR DO BEGINLOOP ENDLOOP CONTINUE READ WRITE TRUE FALSE SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN RETURN
 %token <id_val> IDENT
 %token <num_val> NUMBER
+%type <expression> function declarations declaration vars var expressions expression
+%type <expression> bool-expr relation-and-expr-inv relation-expr comp multiplicative-expression term
+%term <statement> statements statement
 %right ASSIGN
 %left OR
 %left AND
