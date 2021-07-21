@@ -16,7 +16,7 @@ bool mainFunc = false;
 std::set<std::string> funcs;
 std::set<std::string> reserved{"NUMBER", "IDENT", "RETURN", "FUNCTION", "SEMICOLON", "BEGINPARAMS", "ENDPARAMS", "BEGINLOCALS", "ENDLOCALS", "BEGINBODY", "ENDBODY", "BEGINLOOP", "ENDLOOP", "COLON", "INTEGER",
     "COMMA", "ARRAY", "L_SQUARE_BRACKET", "R_SQUARE_BRACKET", "L_PAREN", "R_PAREN", "IF", "ELSE", "THEN", "CONTINUE", "ENDIF", "OF", "READ", "WRITE", "DO", "WHILE", "FOR", "TRUE", "FALSE", "ASSIGN", "EQ", "NEQ",
-    "LT", "LTE", "GT", "GTE", "ADD", "SUB", "MULT", "DIV", "MOD", "AND", "OR", "NOT", "function", "functions", "declaration", "declarations", "var", "vars", "expression", "expressions", "ident", "idents", 
+    "LT", "LTE", "GT", "GTE", "ADD", "SUB", "MULT", "DIV", "MOD", "AND", "OR", "NOT", "function", "functions", "declaration", "declarations", "var", "vars", "expression", "expressions", "Ident", "Idents", 
     "bool_expr", "relation_and_expr", "relation_and_inv", "relation_expr", "comp", "multiplicative-expr", "term", "statement", "statements"};
 void yyerror(const char* s);
 int yylex();
@@ -598,12 +598,12 @@ expression: multiplicative-expr {printf("expression -> multiplicative-expr\n");}
             }
             ;
 multiplicative-expr: term {
-                    /*std::string temp;
-                    std::string dst=new_temp();
+                    std::string temp;
                     temp.append($1.code);
-                    temp.append($1.place);*/
-                    $$.code = strdup($1.code);
-                    $$.place = strdup($1.place); /*went freeballing here, might need fixing*/
+                    temp.append($1.place);
+                    temp.append($"\n");
+                    $$.code = strdup(temp.c_string());
+                    $$.place = strdup(""); /*went freeballing here, might need fixing*/
                     }
                     | term MULT multiplicative-expr {
                         std::string temp;
@@ -657,26 +657,32 @@ multiplicative-expr: term {
 
 term: SUB var 
     {
-        $$.place = strdup(newTemp().c_str());
+        std::string dst=new_temp();
         std::string temp;
-        temp.append($2.code);
-        temp.append(". ");
-        temp.append($$.place);
-        temp.append("\n");
-        if($2.array){
-            temp.append("=[] ");
+        if($2.arr){
+             temp.append($2.code);
+             temp.append(". ");
+            temp.append(dst);
+            temp.append("\n");
+            temp += "=[] " + dst + ", ";
+            temp.append($2.place);
+            temp.append("\n");
         }
         else{
-            temp.append("= ");
+            temp.append(". ");
+            temp.append(dst);
+            temp.append("\n");
+            temp += "= " + dst + ", ";
+            temp.append($2.place);
+            temp.append("\n");
+            temp.append($2.code);
         }
-        temp.append($$.place);
-        temp.append(", ");
-        temp.append($2.place);
-        temp.append("\n");
-
+        if(varTemp.find($2.place) != varTemp.end()){
+            varTemp[$2.place]=dst;
+        }
+        temp +="* " + dst + ", "+dst + ", -1\n";
         $$.code = strdup(temp.c_str());
         $$.place=strdup(temp.c_str());
-        $$.array = false;
     }
     | SUB NUMBER {
         std::string dst = new_temp();
@@ -688,32 +694,47 @@ term: SUB var
         $$.code = strdup(temp.c_str());
         $$.place = strdup(dst.c_str());
     }
-    | SUB L_PAREN expression R_PAREN {
-        $$.code = strdup($2.code);
-        $$.place = strdup($2.place);
+    | SUB L_PAREN expression R_PAREN { 
+        std::string temp;
+        temp.append($3.code);
+        temp.append("* ");
+        temp.append($3.place);
+        temp.append(", ");
+        temp.append($3.place);
+        temp.append(", -1\n");
+        $$.code = strdup(temp.c_str());
+        $$.place = strdup($3.place);
     }
     | var {
-        if($$.array){
-            std::string temp;
-            std::string interm = new_temp();
+        std::string dst = new_temp();
+    std::string temp;
+        if($1.arr){
             temp.append($1.code);
             temp.append(". ");
-            temp.append(interm);
+            temp.append(dst);
             temp.append("\n");
             temp.append("=[] ");
-            temp.append(interm);
+            temp.append(dst);
             temp.append(", ");
             temp.append($1.place);
             temp.append("\n");
-            $$.code = strdup(temp.c_str());
-            $$.place = strdup(interm.c_str());
-            $$.array = false;
         }
         else{
-            $$.code = strdup($1.code);
-            $$.place = strdup($1.place);
+            temp.append(". ");
+            temp.append(dst);
+            temp.append("\n");
+            temp.append("= ");
+            temp.append(dst);
+            temp.append(", ");
+            temp.append($1.place);
+            temp.append("\n");
         }
-    }
+        if(varTemp.find($1.place)!=varTemp.end()){
+            varTemp[$1.place]=dst;
+        }
+        $$.code = strdup(temp.c_str());
+        $$.place = strdup(dst.c_str());
+    } 
     | NUMBER {
         std::string dst = new_temp();
         std::string temp;
@@ -744,7 +765,7 @@ term: SUB var
         $$.place = strdup(dst.c_str());
     }
     ;
-Vars: var
+vars: var
     {
         std::string temp;
         temp.append($1.code);
@@ -776,8 +797,8 @@ Vars: var
         $$.place = strdup("");
     };
 
-var: IDENT {
-    printf("IDENT\n");
+var: Ident {
+    
     std::string temp;
     std::string ident=$1.place;
     if(funcs.find(ident) == functions.end() && varTemp.find(ident)==varTemp.end()){
@@ -790,7 +811,7 @@ var: IDENT {
     $$.place=strdup(ident.c_str());
     $$.arr = false;
     }
-    | IDENT L_SQUARE_BRACKET expression R_SQUARE_BRACKET {
+    | Ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET {
         std::string temp;
         std::string ident = $1.place;
         if(funcs.find(ident) == funcs.end() && varTemp.find(indent) == varTemp.end()){
