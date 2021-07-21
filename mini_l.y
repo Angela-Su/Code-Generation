@@ -29,6 +29,7 @@ std::string new_label();
     char * id_val;
     struct S{
         char* code;
+        char * place;
     } statement;
     struct E{
         char* place;
@@ -56,7 +57,7 @@ std::string new_label();
 /*prog_start: functions { printf("prog_start -> functions\n");}
         ;*/
 
-/*99% of our errors are for the same reason. The $ isn't recognized, something about having "no delcared type". <--------------------------------------*/
+
 Program:    %empty
     {
         if (!mainFunc){
@@ -319,7 +320,7 @@ statement: var ASSIGN expression
             pos = temp.find("continue");
         }
         temp2.append(": ");
-        temp2 += begin + "\n";
+        temp2 += s1 + "\n";
         temp2.append(temp);
         temp2 += ": " + s2 + "\n";
         temp2.append($6.code);
@@ -338,7 +339,7 @@ statement: var ASSIGN expression
         std::string code = $12.code;
         size_t pos = code.find("continue");
         while(pos!=std::string::npos){
-            code.replace(pos, $8, ":= "+"increment"); /*changed this -W*/
+            /*code.replace(pos, $8, ":= ");*/
             pos= code.find("continue");
         }
         temp.append($2.code);

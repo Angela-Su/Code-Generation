@@ -109,6 +109,7 @@ union YYSTYPE
     char * id_val;
     struct S{
         char* code;
+        char * place;
     } statement;
     struct E{
         char* place;
@@ -116,7 +117,7 @@ union YYSTYPE
         bool arr;
     } expression;
 
-#line 120 "mini_l.tab.h" /* yacc.c:1909  */
+#line 121 "mini_l.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

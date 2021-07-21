@@ -1128,7 +1128,7 @@ num_lines++; num_columns = 1;
 case 57:
 YY_RULE_SETUP
 #line 83 "mini_l.lex"
-{printf("Error at line $d, column %d: unrecognized symbol \"%s\"\n", num_lines, num_columns, yytext); exit(-1);}
+{printf("Error at line %d, column %d: unrecognized symbol \"%s\"\n", num_lines, num_columns, yytext); exit(-1);}
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
