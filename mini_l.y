@@ -361,6 +361,8 @@ statement: var ASSIGN expression
         temp +=":= "+after+"\n";
         temp +=": " + inner +"\n";
         temp.append(code);
+        temp += ": " + increment + "\n";
+        temp.append($8.code);
         temp.append($10.code);
         if($8.arr){
             temp+="[]= ";
@@ -371,7 +373,9 @@ statement: var ASSIGN expression
         temp.append($8.place);
         temp.append(", ");
         temp.append($10.place);
-        /*feel unsure here*/
+        temp += "\n";
+        temp += ":= " + condition + "\n";
+        temp += ": " + after + "\n";
         $$.code = strdup(temp.c_str());
     }
     | READ vars
