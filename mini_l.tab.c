@@ -88,7 +88,7 @@ int yylex();
 std::string new_temp();
 std::string new_label();
 
-#line 92 "y.tab.c" /* yacc.c:339  */
+#line 92 "mini_l.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -107,9 +107,9 @@ std::string new_label();
 #endif
 
 /* In a future release of Bison, this section will be replaced
-   by #include "y.tab.h".  */
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
+   by #include "mini_l.tab.h".  */
+#ifndef YY_YY_MINI_L_TAB_H_INCLUDED
+# define YY_YY_MINI_L_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -194,7 +194,7 @@ union YYSTYPE
         bool arr;
     } expression;
 
-#line 198 "y.tab.c" /* yacc.c:355  */
+#line 198 "mini_l.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -207,11 +207,11 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
+#endif /* !YY_YY_MINI_L_TAB_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 
-#line 215 "y.tab.c" /* yacc.c:358  */
+#line 215 "mini_l.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -1384,14 +1384,14 @@ yyreduce:
             printf("No main function was declared\n");
         }
     }
-#line 1388 "y.tab.c" /* yacc.c:1646  */
+#line 1388 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
 #line 67 "mini_l.y" /* yacc.c:1646  */
     {
     }
-#line 1395 "y.tab.c" /* yacc.c:1646  */
+#line 1395 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
@@ -1425,7 +1425,7 @@ yyreduce:
         temp.append("endfunc\n\n");
         printf(temp.c_str());
     }
-#line 1429 "y.tab.c" /* yacc.c:1646  */
+#line 1429 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
@@ -1435,7 +1435,7 @@ yyreduce:
                 (yyval.expression).place = strdup("");
                 (yyval.expression).code = strdup("");
                 }
-#line 1439 "y.tab.c" /* yacc.c:1646  */
+#line 1439 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
@@ -1448,7 +1448,7 @@ yyreduce:
                 (yyval.expression).code = strdup(temp.c_str());
                 (yyval.expression).place=strdup("");
                 }
-#line 1452 "y.tab.c" /* yacc.c:1646  */
+#line 1452 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
@@ -1497,7 +1497,7 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup("");
     }
-#line 1501 "y.tab.c" /* yacc.c:1646  */
+#line 1501 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
@@ -1554,7 +1554,7 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup("");
     }
-#line 1558 "y.tab.c" /* yacc.c:1646  */
+#line 1558 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
@@ -1565,7 +1565,7 @@ yyreduce:
         temp.append((yyvsp[0].statement).code);
         (yyval.statement).code = strdup(temp.c_str());
     }
-#line 1569 "y.tab.c" /* yacc.c:1646  */
+#line 1569 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
@@ -1573,7 +1573,7 @@ yyreduce:
     {
         (yyval.statement).code = strdup((yyvsp[-1].statement).code);
     }
-#line 1577 "y.tab.c" /* yacc.c:1646  */
+#line 1577 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
@@ -1601,7 +1601,7 @@ yyreduce:
         temp += "\n";
         (yyval.statement).code = strdup(temp.c_str());
     }
-#line 1605 "y.tab.c" /* yacc.c:1646  */
+#line 1605 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
@@ -1618,7 +1618,7 @@ yyreduce:
         temp = temp + ": " + s2 + "\n";
         (yyval.statement).code = strdup(temp.c_str());
     }
-#line 1622 "y.tab.c" /* yacc.c:1646  */
+#line 1622 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
@@ -1636,7 +1636,7 @@ yyreduce:
         temp = temp + ": " + s2 + "\n";
         (yyval.statement).code = strdup(temp.c_str());
     }
-#line 1640 "y.tab.c" /* yacc.c:1646  */
+#line 1640 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
@@ -1667,7 +1667,7 @@ yyreduce:
         temp2 += ": " + s2 + "\n";
         (yyval.statement).code = strdup(temp2.c_str());
     }
-#line 1671 "y.tab.c" /* yacc.c:1646  */
+#line 1671 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
@@ -1692,7 +1692,7 @@ yyreduce:
         temp2.append("\n");
         (yyval.statement).code = strdup(temp.c_str());
     }
-#line 1696 "y.tab.c" /* yacc.c:1646  */
+#line 1696 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
@@ -1706,7 +1706,7 @@ yyreduce:
         std::string code = (yyvsp[-1].statement).code;
         size_t pos = code.find("continue");
         while(pos!=std::string::npos){
-            code.replace(pos, (yyvsp[-5].expression), ":= "+increment);
+            code.replace(pos, (yyvsp[-5].expression), ":= "+"increment"); /*changed this -W*/
             pos= code.find("continue");
         }
         temp.append((yyvsp[-11].expression).code);
@@ -1742,7 +1742,7 @@ yyreduce:
         /*feel unsure here*/
         (yyval.statement).code = strdup(temp.c_str());
     }
-#line 1746 "y.tab.c" /* yacc.c:1646  */
+#line 1746 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
@@ -1757,7 +1757,7 @@ yyreduce:
         }
         (yyval.statement).code = strdup(temp.c_str());
     }
-#line 1761 "y.tab.c" /* yacc.c:1646  */
+#line 1761 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
@@ -1773,7 +1773,7 @@ yyreduce:
         }
         (yyval.statement).code = strdup(temp.c_str());
     }
-#line 1777 "y.tab.c" /* yacc.c:1646  */
+#line 1777 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
@@ -1781,7 +1781,7 @@ yyreduce:
     {
         (yyval.statement).code = strdup("continue\n");
     }
-#line 1785 "y.tab.c" /* yacc.c:1646  */
+#line 1785 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
@@ -1794,16 +1794,16 @@ yyreduce:
         temp.append("\n");
         (yyval.statement).code = strdup(temp.c_str());
     }
-#line 1798 "y.tab.c" /* yacc.c:1646  */
+#line 1798 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
 #line 416 "mini_l.y" /* yacc.c:1646  */
     {
         (yyval.expression).code = strdup((yyvsp[0].expression).code);
-        (yyval.expression).place = strdup(1.place);
+        (yyval.expression).place = strdup((yyvsp[0].expression).place);
     }
-#line 1807 "y.tab.c" /* yacc.c:1646  */
+#line 1807 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
@@ -1818,11 +1818,11 @@ yyreduce:
         temp.append((yyvsp[-2].expression).place);
         temp.append(", ");
         temp.append((yyvsp[0].expression).place);
-        tmep.append("\n");
+        temp.append("\n");
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup(dst.c_str());
     }
-#line 1826 "y.tab.c" /* yacc.c:1646  */
+#line 1826 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
@@ -1836,7 +1836,7 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup(dst.c_str());
     }
-#line 1840 "y.tab.c" /* yacc.c:1646  */
+#line 1840 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
@@ -1845,7 +1845,7 @@ yyreduce:
         (yyval.expression).code = strdup((yyvsp[0].expression).code);
         (yyval.expression).place = strdup((yyvsp[0].expression).place);
     }
-#line 1849 "y.tab.c" /* yacc.c:1646  */
+#line 1849 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
@@ -1858,7 +1858,7 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup(dst.c_str());
     }
-#line 1862 "y.tab.c" /* yacc.c:1646  */
+#line 1862 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
@@ -1867,7 +1867,7 @@ yyreduce:
         (yyval.expression).code = strdup((yyvsp[0].expression).code);
         (yyval.expression).place = strdup((yyvsp[0].expression).place);
     }
-#line 1871 "y.tab.c" /* yacc.c:1646  */
+#line 1871 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
@@ -1881,7 +1881,7 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup(dst.c_str());
     }
-#line 1885 "y.tab.c" /* yacc.c:1646  */
+#line 1885 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
@@ -1892,7 +1892,7 @@ yyreduce:
         (yyval.expression).code = strdup("");
         (yyval.expression).place = strdup(temp.c_str());
     }
-#line 1896 "y.tab.c" /* yacc.c:1646  */
+#line 1896 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
@@ -1903,7 +1903,7 @@ yyreduce:
         (yyval.expression).code = strdup("");
         (yyval.expression).place = strdup(temp.c_str());
     }
-#line 1907 "y.tab.c" /* yacc.c:1646  */
+#line 1907 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
@@ -1912,7 +1912,7 @@ yyreduce:
         (yyval.expression).code = strdup((yyvsp[-1].expression).code);
         (yyval.expression).place = strdup((yyvsp[-1].expression).place);
     }
-#line 1916 "y.tab.c" /* yacc.c:1646  */
+#line 1916 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
@@ -1921,7 +1921,7 @@ yyreduce:
         (yyval.expression).place = strdup((yyvsp[0].id_val));
         (yyval.expression).code = strdup("");
     }
-#line 1925 "y.tab.c" /* yacc.c:1646  */
+#line 1925 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
@@ -1930,7 +1930,7 @@ yyreduce:
         (yyval.expression).place = strdup("");
         (yyval.expression).code = strdup("== ");
     }
-#line 1934 "y.tab.c" /* yacc.c:1646  */
+#line 1934 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
@@ -1939,7 +1939,7 @@ yyreduce:
         (yyval.expression).place = strdup("");
         (yyval.expression).code = strdup("!= ");
     }
-#line 1943 "y.tab.c" /* yacc.c:1646  */
+#line 1943 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
@@ -1948,7 +1948,7 @@ yyreduce:
         (yyval.expression).place = strdup("");
         (yyval.expression).code = strdup("< ");
     }
-#line 1952 "y.tab.c" /* yacc.c:1646  */
+#line 1952 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
@@ -1957,7 +1957,7 @@ yyreduce:
         (yyval.expression).place = strdup("");
         (yyval.expression).code = strdup("<= ");
     }
-#line 1961 "y.tab.c" /* yacc.c:1646  */
+#line 1961 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
@@ -1966,7 +1966,7 @@ yyreduce:
         (yyval.expression).place = strdup("");
         (yyval.expression).code = strdup("> ");
     }
-#line 1970 "y.tab.c" /* yacc.c:1646  */
+#line 1970 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
@@ -1975,7 +1975,7 @@ yyreduce:
         (yyval.expression).place = strdup("");
         (yyval.expression).code = strdup(">= ");
     }
-#line 1979 "y.tab.c" /* yacc.c:1646  */
+#line 1979 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
@@ -1984,13 +1984,13 @@ yyreduce:
                 std::string temp;
                 temp.append((yyvsp[-2].expression).code);
                 temp.append("param ");
-                te,p.append((yyvsp[-2].expression).place);
+                temp.append((yyvsp[-2].expression).place);
                 temp.append("\n");
                 temp.append((yyvsp[0].expression).code);   /* I think this is sufficient, but not totally sure*/
                 (yyval.expression).code=strdup(temp.c_str());
                 (yyval.expression).place=strdup(temp.c_str());
             }
-#line 1994 "y.tab.c" /* yacc.c:1646  */
+#line 1994 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
@@ -2003,13 +2003,13 @@ yyreduce:
                 (yyval.expression).code=strdup(temp.c_str());
                 (yyval.expression).place=strdup(temp.c_str());
             }
-#line 2007 "y.tab.c" /* yacc.c:1646  */
+#line 2007 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
 #line 577 "mini_l.y" /* yacc.c:1646  */
     {printf("expression -> multiplicative-expr\n");}
-#line 2013 "y.tab.c" /* yacc.c:1646  */
+#line 2013 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
@@ -2029,7 +2029,7 @@ yyreduce:
                 (yyval.expression).place = strdup(dst.c_str());
 
             }
-#line 2033 "y.tab.c" /* yacc.c:1646  */
+#line 2033 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
@@ -2049,7 +2049,7 @@ yyreduce:
                 (yyval.expression).place = strdup(dst.c_str());
 
             }
-#line 2053 "y.tab.c" /* yacc.c:1646  */
+#line 2053 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
@@ -2059,10 +2059,10 @@ yyreduce:
                     temp.append((yyvsp[0].expression).code);
                     temp.append((yyvsp[0].expression).place);
                     temp.append("\n");
-                    (yyval.expression).code = strdup(temp.c_string());
+                    (yyval.expression).code = strdup(temp.c_str());
                     (yyval.expression).place = strdup(""); /*went freeballing here, might need fixing*/
                     }
-#line 2066 "y.tab.c" /* yacc.c:1646  */
+#line 2066 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
@@ -2083,7 +2083,7 @@ yyreduce:
                         (yyval.expression).code = strdup(temp.c_str());
                         (yyval.expression).place = strdup(dst.c_str());
                     }
-#line 2087 "y.tab.c" /* yacc.c:1646  */
+#line 2087 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
@@ -2104,7 +2104,7 @@ yyreduce:
                         (yyval.expression).code = strdup(temp.c_str());
                         (yyval.expression).place = strdup(dst.c_str());
                     }
-#line 2108 "y.tab.c" /* yacc.c:1646  */
+#line 2108 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
@@ -2125,7 +2125,7 @@ yyreduce:
                         (yyval.expression).code = strdup(temp.c_str());
                         (yyval.expression).place = strdup(dst.c_str());
                     }
-#line 2129 "y.tab.c" /* yacc.c:1646  */
+#line 2129 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
@@ -2158,7 +2158,7 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place=strdup(temp.c_str());
     }
-#line 2162 "y.tab.c" /* yacc.c:1646  */
+#line 2162 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
@@ -2173,7 +2173,7 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup(dst.c_str());
     }
-#line 2177 "y.tab.c" /* yacc.c:1646  */
+#line 2177 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
@@ -2189,7 +2189,7 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup((yyvsp[-1].expression).place);
     }
-#line 2193 "y.tab.c" /* yacc.c:1646  */
+#line 2193 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
@@ -2224,7 +2224,7 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup(dst.c_str());
     }
-#line 2228 "y.tab.c" /* yacc.c:1646  */
+#line 2228 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
@@ -2239,7 +2239,7 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup(dst.c_str());
     }
-#line 2243 "y.tab.c" /* yacc.c:1646  */
+#line 2243 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
@@ -2248,7 +2248,7 @@ yyreduce:
         (yyval.expression).code = strdup((yyvsp[-1].expression).code);
         (yyval.expression).place = strdup((yyvsp[-1].expression).place);
     }
-#line 2252 "y.tab.c" /* yacc.c:1646  */
+#line 2252 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
@@ -2267,7 +2267,7 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup(dst.c_str());
     }
-#line 2271 "y.tab.c" /* yacc.c:1646  */
+#line 2271 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
@@ -2286,7 +2286,7 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup("");
     }
-#line 2290 "y.tab.c" /* yacc.c:1646  */
+#line 2290 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
@@ -2306,7 +2306,7 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup("");
     }
-#line 2310 "y.tab.c" /* yacc.c:1646  */
+#line 2310 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
@@ -2315,17 +2315,17 @@ yyreduce:
     
     std::string temp;
     std::string ident=(yyvsp[0].expression).place;
-    if(funcs.find(ident) == functions.end() && varTemp.find(ident)==varTemp.end()){
+    if(funcs.find(ident) == funcs.end() && varTemp.find(ident)==varTemp.end()){
         printf("Identifier %s is not declared.\n",ident.c_str());
     }
-    else(if(arrSize[ident]>1){
+    else if(arrSize[ident]>1){
         printf("Did not provide index for array Identifier %s.\n", ident.c_str());
     }
     (yyval.expression).code = strdup("");
     (yyval.expression).place=strdup(ident.c_str());
     (yyval.expression).arr = false;
     }
-#line 2329 "y.tab.c" /* yacc.c:1646  */
+#line 2329 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
@@ -2346,11 +2346,11 @@ yyreduce:
         (yyval.expression).place = strdup(temp.c_str());
         (yyval.expression).arr = true;
     }
-#line 2350 "y.tab.c" /* yacc.c:1646  */
+#line 2350 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2354 "y.tab.c" /* yacc.c:1646  */
+#line 2354 "mini_l.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2584,14 +2584,14 @@ yyreturn:
 void yyerror(const char* s)
 {
     extern int yylineno;
-    extern char **yytext;
+    extern char *yytext;
 
         printf("%s on line %d at char %d at symbol \"%s\"\n", s, yylineno, num_columns, yytext);
         exit(1);
 }
 
 
-std:string new_temp(){
+std::string new_temp(){
     std::string t= "t" + std::to_string(tempCount);
     tempCount++;
     return t;

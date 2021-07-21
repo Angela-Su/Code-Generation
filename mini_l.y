@@ -9,14 +9,14 @@
 int tempCount = 0;
 int labelCount = 0;
 extern char* yytext;
-extern int currPos;
+extern int num_columns;
 std::map<std::string, std::string> varTemp;
 std::map<std::string, int> arrSize;
 bool mainFunc = false;
 std::set<std::string> funcs;
 std::set<std::string> reserved{"NUMBER", "IDENT", "RETURN", "FUNCTION", "SEMICOLON", "BEGINPARAMS", "ENDPARAMS", "BEGINLOCALS", "ENDLOCALS", "BEGINBODY", "ENDBODY", "BEGINLOOP", "ENDLOOP", "COLON", "INTEGER",
     "COMMA", "ARRAY", "L_SQUARE_BRACKET", "R_SQUARE_BRACKET", "L_PAREN", "R_PAREN", "IF", "ELSE", "THEN", "CONTINUE", "ENDIF", "OF", "READ", "WRITE", "DO", "WHILE", "FOR", "TRUE", "FALSE", "ASSIGN", "EQ", "NEQ",
-    "LT", "LTE", "GT", "GTE", "ADD", "SUB", "MULT", "DIV", "MOD", "AND", "OR", "NOT", "function", "functions", "declaration", "declarations", "var", "vars", "expression", "expressions", "Ident", "Idents", 
+    "LT", "LTE", "GT", "GTE", "ADD", "SUB", "MULT", "DIV", "MOD", "AND", "OR", "NOT", "function", "functions", "declaration", "declarations", "var", "vars", "expression", "expressions", "Ident", 
     "bool_expr", "relation_and_expr", "relation_and_inv", "relation_expr", "comp", "multiplicative-expr", "term", "statement", "statements"};
 void yyerror(const char* s);
 int yylex();
@@ -26,14 +26,22 @@ std::string new_label();
 
 %union{
     int num_val;
-    char* id_val;
+    char * id_val;
+    struct S{
+        char* code;
+    } statement;
+    struct E{
+        char* place;
+        char *code;
+        bool arr;
+    } expression;
 }
 %error-verbose
 %start Program
 %token FUNCTION BEGINPARAMS ENDPARAMS BEGINLOCALS ENDLOCALS BEGINBODY ENDBODY INTEGER ARRAY ENUM OF IF THEN ENDIF ELSE WHILE FOR DO BEGINLOOP ENDLOOP CONTINUE READ WRITE TRUE FALSE SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN RETURN
 %token <id_val> IDENT
 %token <num_val> NUMBER
-%type <expression> function declarations declaration vars var expressions expression Ident Idents
+%type <expression> function declarations declaration vars var expressions expression Ident 
 %type <expression> bool_expr relation_and_expr relation_expr_inv relation_expr comp multiplicative-expr term
 %type <statement> statements statement
 %right ASSIGN
@@ -93,7 +101,7 @@ function: FUNCTION IDENT SEMICOLON BEGINPARAMS declarations ENDPARAMS BEGINLOCAL
     ;
         
 
-declarations: /*empty*/{ /* might need %empty*/
+declarations: %empty{ 
                 /*printf("declarations -> epsilon\n");*/
                 $$.place = strdup("");
                 $$.code = strdup("");
@@ -330,7 +338,7 @@ statement: var ASSIGN expression
         std::string code = $12.code;
         size_t pos = code.find("continue");
         while(pos!=std::string::npos){
-            code.replace(pos, $8, ":= "+increment);
+            code.replace(pos, $8, ":= "+"increment"); /*changed this -W*/
             pos= code.find("continue");
         }
         temp.append($2.code);
@@ -407,7 +415,7 @@ statement: var ASSIGN expression
 bool_expr: relation_and_expr
     {
         $$.code = strdup($1.code);
-        $$.place = strdup(1.place);
+        $$.place = strdup($1.place);
     }
     | relation_and_expr OR bool_expr
     {
@@ -420,7 +428,7 @@ bool_expr: relation_and_expr
         temp.append($1.place);
         temp.append(", ");
         temp.append($3.place);
-        tmep.append("\n");
+        temp.append("\n");
         $$.code = strdup(temp.c_str());
         $$.place = strdup(dst.c_str());
     }
@@ -497,7 +505,7 @@ Ident: IDENT
     }
     ;
     
-Idents: Ident
+/*Idents: Ident
     {
         $$.place = strdup($1);
         $$.code = strdup("");
@@ -511,7 +519,7 @@ Idents: Ident
         $$.place = strdup(temp.c_str());
         $$.code = strdup("");
     }
-    ; 
+    ; */
 
 comp: EQ
     {
@@ -550,7 +558,7 @@ expressions: expression COMMA expressions
                 std::string temp;
                 temp.append($1.code);
                 temp.append("param ");
-                te,p.append($1.place);
+                temp.append($1.place);
                 temp.append("\n");
                 temp.append($3.code);   /* I think this is sufficient, but not totally sure*/
                 $$.code=strdup(temp.c_str());
@@ -603,7 +611,7 @@ multiplicative-expr: term {
                     temp.append($1.code);
                     temp.append($1.place);
                     temp.append("\n");
-                    $$.code = strdup(temp.c_string());
+                    $$.code = strdup(temp.c_str());
                     $$.place = strdup(""); /*went freeballing here, might need fixing*/
                     }
                     | term MULT multiplicative-expr {
@@ -802,10 +810,10 @@ var: Ident {
     
     std::string temp;
     std::string ident=$1.place;
-    if(funcs.find(ident) == functions.end() && varTemp.find(ident)==varTemp.end()){
+    if(funcs.find(ident) == funcs.end() && varTemp.find(ident)==varTemp.end()){
         printf("Identifier %s is not declared.\n",ident.c_str());
     }
-    else(if(arrSize[ident]>1){
+    else if(arrSize[ident]>1){
         printf("Did not provide index for array Identifier %s.\n", ident.c_str());
     }
     $$.code = strdup("");
@@ -815,7 +823,7 @@ var: Ident {
     | Ident L_SQUARE_BRACKET expression R_SQUARE_BRACKET {
         std::string temp;
         std::string ident = $1.place;
-        if(funcs.find(ident) == funcs.end() && varTemp.find(indent) == varTemp.end()){
+        if(funcs.find(ident) == funcs.end() && varTemp.find(ident) == varTemp.end()){
             printf("Identifier %s is not declared.\n", ident.c_str());
         }
         else if(arrSize[ident] == 1){
@@ -835,14 +843,14 @@ var: Ident {
 void yyerror(const char* s)
 {
     extern int yylineno;
-    extern char **yytext;
+    extern char *yytext;
 
         printf("%s on line %d at char %d at symbol \"%s\"\n", s, yylineno, num_columns, yytext);
         exit(1);
 }
 
 
-std:string new_temp(){
+std::string new_temp(){
     std::string t= "t" + std::to_string(tempCount);
     tempCount++;
     return t;
@@ -854,7 +862,7 @@ std::string new_label(){
     return l;
 }
 
-
+/*
 int main(int argc, char ** argv) {
     if(argc > 1) {
         yyin = fopen(argv[1], "r");
@@ -867,4 +875,4 @@ int main(int argc, char ** argv) {
 }
 void yyerror(const char *msg) {
     printf("Error: Line %d, position %d: %s \n", num_lines, num_columns, msg);
-}
+}*/
