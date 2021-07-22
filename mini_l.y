@@ -336,11 +336,12 @@ statement: var ASSIGN expression
         std::string dst=new_temp();
         std::string condition = new_label();
         std::string inner = new_label();
+        std::string increment = new_label();
         std::string after = new_label();
         std::string code = $12.code;
         size_t pos = code.find("continue");
         while(pos!=std::string::npos){
-            code.replace(pos, $8, ":= "+"increment"); /*changed this -W*/
+            code.replace(pos, 8, ":= " + increment);
             pos= code.find("continue");
         }
         temp.append($2.code);
