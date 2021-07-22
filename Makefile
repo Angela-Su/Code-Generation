@@ -1,8 +1,8 @@
 CFLAGS = -g -Wall -ansi -pedantic
 
-parse: sol.lex mini_l.y
+parse: mini_l.lex mini_l.y
 	bison -v -d mini_l.y
-	flex sol.lex
+	flex mini_l.lex
 	g++ $(CFLAGS) -std=c++11 lex.yy.c mini_l.tab.c -lfl -o phase3
 test:
 	#cat ./tests/min/primes.min |./phase3 > ./Phase3/mil/primes.mil

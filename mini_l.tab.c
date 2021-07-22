@@ -515,12 +515,12 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint16 yyrline[] =
 {
        0,    61,    61,    67,    72,   105,   110,   120,   165,   220,
-     227,   233,   257,   270,   284,   311,   332,   378,   389,   401,
-     405,   416,   421,   439,   449,   456,   465,   471,   481,   488,
-     495,   502,   509,   514,   525,   538,   543,   548,   553,   558,
-     563,   570,   581,   591,   595,   610,   626,   634,   650,   666,
-     684,   713,   723,   734,   764,   774,   779,   794,   809,   826,
-     840
+     227,   233,   257,   270,   284,   311,   332,   383,   394,   406,
+     410,   421,   426,   444,   454,   461,   470,   476,   486,   493,
+     500,   507,   514,   519,   530,   543,   548,   553,   558,   563,
+     568,   575,   586,   597,   601,   616,   632,   636,   652,   668,
+     686,   715,   725,   736,   766,   776,   781,   796,   811,   828,
+     842
 };
 #endif
 
@@ -1391,7 +1391,7 @@ yyreduce:
 #line 62 "mini_l.y" /* yacc.c:1646  */
     {
         if (!mainFunc){
-            printf("No main function was declared\n");
+            printf("No main function was declared.\n");
         }
     }
 #line 1398 "mini_l.tab.c" /* yacc.c:1646  */
@@ -1488,7 +1488,7 @@ yyreduce:
                 ex = true;
             }
             else{
-                std::string ident = parse.substr(left, right - left);
+                std::string ident = parse.substr(left, right-left);
                 if(reserved.find(ident) != reserved.end()){
                     printf("Identifier %s's name is a reserved word, can't be used.\n", ident.c_str());
                 }
@@ -1712,11 +1712,12 @@ yyreduce:
         std::string dst=new_temp();
         std::string condition = new_label();
         std::string inner = new_label();
+        std::string increment = new_label();
         std::string after = new_label();
         std::string code = (yyvsp[-1].statement).code;
         size_t pos = code.find("continue");
         while(pos!=std::string::npos){
-            /*code.replace(pos, $8, ":= ");*/
+            code.replace(pos, 8, ":= "+increment);
             pos= code.find("continue");
         }
         temp.append((yyvsp[-11].expression).code);
@@ -1739,6 +1740,8 @@ yyreduce:
         temp +=":= "+after+"\n";
         temp +=": " + inner +"\n";
         temp.append(code);
+        temp += ": " + increment + "\n";
+        temp.append((yyvsp[-5].expression).code);
         temp.append((yyvsp[-3].expression).code);
         if((yyvsp[-5].expression).arr){
             temp+="[]= ";
@@ -1749,14 +1752,16 @@ yyreduce:
         temp.append((yyvsp[-5].expression).place);
         temp.append(", ");
         temp.append((yyvsp[-3].expression).place);
-        /*feel unsure here*/
+        temp += "\n";
+        temp += ":= " + condition + "\n";
+        temp += ": " + after + "\n";
         (yyval.statement).code = strdup(temp.c_str());
     }
-#line 1756 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1761 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 379 "mini_l.y" /* yacc.c:1646  */
+#line 384 "mini_l.y" /* yacc.c:1646  */
     {
         std::string temp;
         temp.append((yyvsp[0].expression).code);
@@ -1767,11 +1772,11 @@ yyreduce:
         }
         (yyval.statement).code = strdup(temp.c_str());
     }
-#line 1771 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1776 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 390 "mini_l.y" /* yacc.c:1646  */
+#line 395 "mini_l.y" /* yacc.c:1646  */
     {
         std::string temp;
         temp.append((yyvsp[0].expression).code);
@@ -1783,19 +1788,19 @@ yyreduce:
         }
         (yyval.statement).code = strdup(temp.c_str());
     }
-#line 1787 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1792 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 402 "mini_l.y" /* yacc.c:1646  */
+#line 407 "mini_l.y" /* yacc.c:1646  */
     {
         (yyval.statement).code = strdup("continue\n");
     }
-#line 1795 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1800 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 406 "mini_l.y" /* yacc.c:1646  */
+#line 411 "mini_l.y" /* yacc.c:1646  */
     {
         std::string temp;
         temp.append((yyvsp[0].expression).code);
@@ -1804,20 +1809,20 @@ yyreduce:
         temp.append("\n");
         (yyval.statement).code = strdup(temp.c_str());
     }
-#line 1808 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1813 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 417 "mini_l.y" /* yacc.c:1646  */
+#line 422 "mini_l.y" /* yacc.c:1646  */
     {
         (yyval.expression).code = strdup((yyvsp[0].expression).code);
         (yyval.expression).place = strdup((yyvsp[0].expression).place);
     }
-#line 1817 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1822 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 422 "mini_l.y" /* yacc.c:1646  */
+#line 427 "mini_l.y" /* yacc.c:1646  */
     {
         std::string temp;
         std::string dst = new_temp();
@@ -1832,11 +1837,11 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup(dst.c_str());
     }
-#line 1836 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1841 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 440 "mini_l.y" /* yacc.c:1646  */
+#line 445 "mini_l.y" /* yacc.c:1646  */
     {
         std::string dst = new_temp();
         std::string temp;
@@ -1846,20 +1851,20 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup(dst.c_str());
     }
-#line 1850 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1855 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 450 "mini_l.y" /* yacc.c:1646  */
+#line 455 "mini_l.y" /* yacc.c:1646  */
     {
         (yyval.expression).code = strdup((yyvsp[0].expression).code);
         (yyval.expression).place = strdup((yyvsp[0].expression).place);
     }
-#line 1859 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1864 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 457 "mini_l.y" /* yacc.c:1646  */
+#line 462 "mini_l.y" /* yacc.c:1646  */
     {
         std::string dst = new_temp();
         std::string temp;
@@ -1868,20 +1873,20 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup(dst.c_str());
     }
-#line 1872 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1877 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 466 "mini_l.y" /* yacc.c:1646  */
+#line 471 "mini_l.y" /* yacc.c:1646  */
     {
         (yyval.expression).code = strdup((yyvsp[0].expression).code);
         (yyval.expression).place = strdup((yyvsp[0].expression).place);
     }
-#line 1881 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1886 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 472 "mini_l.y" /* yacc.c:1646  */
+#line 477 "mini_l.y" /* yacc.c:1646  */
     {
         std::string dst = new_temp();
         std::string temp;
@@ -1891,60 +1896,60 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup(dst.c_str());
     }
-#line 1895 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1900 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 482 "mini_l.y" /* yacc.c:1646  */
+#line 487 "mini_l.y" /* yacc.c:1646  */
     {
         std::string temp;
         temp.append("1");
         (yyval.expression).code = strdup("");
         (yyval.expression).place = strdup(temp.c_str());
     }
-#line 1906 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1911 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 489 "mini_l.y" /* yacc.c:1646  */
+#line 494 "mini_l.y" /* yacc.c:1646  */
     {
         std::string temp;
         temp.append("0");
         (yyval.expression).code = strdup("");
         (yyval.expression).place = strdup(temp.c_str());
     }
-#line 1917 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1922 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 496 "mini_l.y" /* yacc.c:1646  */
+#line 501 "mini_l.y" /* yacc.c:1646  */
     {
         (yyval.expression).code = strdup((yyvsp[-1].expression).code);
         (yyval.expression).place = strdup((yyvsp[-1].expression).place);
     }
-#line 1926 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1931 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 503 "mini_l.y" /* yacc.c:1646  */
+#line 508 "mini_l.y" /* yacc.c:1646  */
     {
         (yyval.expression).place = strdup((yyvsp[0].id_val));
         (yyval.expression).code = strdup("");
     }
-#line 1935 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1940 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 510 "mini_l.y" /* yacc.c:1646  */
+#line 515 "mini_l.y" /* yacc.c:1646  */
     {
         (yyval.expression).place = strdup((yyvsp[0].expression).place);
         (yyval.expression).code = strdup("");
     }
-#line 1944 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1949 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 515 "mini_l.y" /* yacc.c:1646  */
+#line 520 "mini_l.y" /* yacc.c:1646  */
     {
         std::string temp;
         temp.append((yyvsp[-2].expression).place);
@@ -1953,11 +1958,11 @@ yyreduce:
         (yyval.expression).place = strdup(temp.c_str());
         (yyval.expression).code = strdup("");
     }
-#line 1957 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1962 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 526 "mini_l.y" /* yacc.c:1646  */
+#line 531 "mini_l.y" /* yacc.c:1646  */
     {
         if (funcs.find((yyvsp[0].id_val)) != funcs.end()){
             printf("function name %s already declared.\n", (yyvsp[0].id_val));
@@ -1968,65 +1973,65 @@ yyreduce:
     (yyval.expression).place = strdup((yyvsp[0].id_val));
     (yyval.expression).code = strdup("");
     }
-#line 1972 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1977 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 539 "mini_l.y" /* yacc.c:1646  */
+#line 544 "mini_l.y" /* yacc.c:1646  */
     {
-        (yyval.expression).place = strdup("");
-        (yyval.expression).code = strdup("== ");
+        (yyval.expression).code = strdup("");
+        (yyval.expression).place = strdup("== ");
     }
-#line 1981 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1986 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 544 "mini_l.y" /* yacc.c:1646  */
+#line 549 "mini_l.y" /* yacc.c:1646  */
     {
-        (yyval.expression).place = strdup("");
-        (yyval.expression).code = strdup("!= ");
+        (yyval.expression).code = strdup("");
+        (yyval.expression).place = strdup("!= ");
     }
-#line 1990 "mini_l.tab.c" /* yacc.c:1646  */
+#line 1995 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 549 "mini_l.y" /* yacc.c:1646  */
+#line 554 "mini_l.y" /* yacc.c:1646  */
     {
-        (yyval.expression).place = strdup("");
-        (yyval.expression).code = strdup("< ");
+        (yyval.expression).code = strdup("");
+        (yyval.expression).place = strdup("< ");
     }
-#line 1999 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2004 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 554 "mini_l.y" /* yacc.c:1646  */
+#line 559 "mini_l.y" /* yacc.c:1646  */
     {
-        (yyval.expression).place = strdup("");
-        (yyval.expression).code = strdup("<= ");
+        (yyval.expression).code = strdup("");
+        (yyval.expression).place = strdup("<= ");
     }
-#line 2008 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2013 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 559 "mini_l.y" /* yacc.c:1646  */
+#line 564 "mini_l.y" /* yacc.c:1646  */
     {
-        (yyval.expression).place = strdup("");
-        (yyval.expression).code = strdup("> ");
+        (yyval.expression).code = strdup("");
+        (yyval.expression).place = strdup("> ");
     }
-#line 2017 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2022 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 564 "mini_l.y" /* yacc.c:1646  */
+#line 569 "mini_l.y" /* yacc.c:1646  */
     {
-        (yyval.expression).place = strdup("");
-        (yyval.expression).code = strdup(">= ");
+        (yyval.expression).code = strdup("");
+        (yyval.expression).place = strdup(">= ");
     }
-#line 2026 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2031 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 571 "mini_l.y" /* yacc.c:1646  */
+#line 576 "mini_l.y" /* yacc.c:1646  */
     {
                 std::string temp;
                 temp.append((yyvsp[-2].expression).code);
@@ -2035,35 +2040,36 @@ yyreduce:
                 temp.append("\n");
                 temp.append((yyvsp[0].expression).code);   /* I think this is sufficient, but not totally sure*/
                 (yyval.expression).code=strdup(temp.c_str());
-                (yyval.expression).place=strdup(temp.c_str());
+                (yyval.expression).place=strdup("");
             }
-#line 2041 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2046 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 581 "mini_l.y" /* yacc.c:1646  */
+#line 586 "mini_l.y" /* yacc.c:1646  */
     {
                 std::string temp;
+                temp.append((yyvsp[0].expression).code);
                 temp.append("param ");
                 temp.append((yyvsp[0].expression).place);
                 temp.append("\n");
                 (yyval.expression).code=strdup(temp.c_str());
-                (yyval.expression).place=strdup(temp.c_str());
+                (yyval.expression).place=strdup("");
             }
-#line 2054 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2060 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 591 "mini_l.y" /* yacc.c:1646  */
+#line 597 "mini_l.y" /* yacc.c:1646  */
     {
                 (yyval.expression).code = strdup((yyvsp[0].expression).code);
         (yyval.expression).place = strdup((yyvsp[0].expression).place);
             }
-#line 2063 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2069 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 595 "mini_l.y" /* yacc.c:1646  */
+#line 601 "mini_l.y" /* yacc.c:1646  */
     {
                 std::string temp;
                 std::string dst= new_temp();
@@ -2079,11 +2085,11 @@ yyreduce:
                 (yyval.expression).place = strdup(dst.c_str());
 
             }
-#line 2083 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2089 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 610 "mini_l.y" /* yacc.c:1646  */
+#line 616 "mini_l.y" /* yacc.c:1646  */
     {
                 std::string temp;
                 std::string dst= new_temp();
@@ -2099,24 +2105,20 @@ yyreduce:
                 (yyval.expression).place = strdup(dst.c_str());
 
             }
-#line 2103 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2109 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 626 "mini_l.y" /* yacc.c:1646  */
+#line 632 "mini_l.y" /* yacc.c:1646  */
     {
-                    std::string temp;
-                    temp.append((yyvsp[0].expression).code);
-                    temp.append((yyvsp[0].expression).place);
-                    temp.append("\n");
-                    (yyval.expression).code = strdup(temp.c_str());
-                    (yyval.expression).place = strdup(""); /*went freeballing here, might need fixing*/
+                    (yyval.expression).code = strdup((yyvsp[0].expression).code);
+                    (yyval.expression).place = strdup((yyvsp[0].expression).place);
                     }
-#line 2116 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2118 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 634 "mini_l.y" /* yacc.c:1646  */
+#line 636 "mini_l.y" /* yacc.c:1646  */
     {
                         std::string temp;
                         std::string dst = new_temp();
@@ -2133,11 +2135,11 @@ yyreduce:
                         (yyval.expression).code = strdup(temp.c_str());
                         (yyval.expression).place = strdup(dst.c_str());
                     }
-#line 2137 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2139 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 650 "mini_l.y" /* yacc.c:1646  */
+#line 652 "mini_l.y" /* yacc.c:1646  */
     {
                         std::string temp;
                         std::string dst = new_temp();
@@ -2154,11 +2156,11 @@ yyreduce:
                         (yyval.expression).code = strdup(temp.c_str());
                         (yyval.expression).place = strdup(dst.c_str());
                     }
-#line 2158 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2160 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 666 "mini_l.y" /* yacc.c:1646  */
+#line 668 "mini_l.y" /* yacc.c:1646  */
     {
                         std::string temp;
                         std::string dst = new_temp();
@@ -2175,11 +2177,11 @@ yyreduce:
                         (yyval.expression).code = strdup(temp.c_str());
                         (yyval.expression).place = strdup(dst.c_str());
                     }
-#line 2179 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2181 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 685 "mini_l.y" /* yacc.c:1646  */
+#line 687 "mini_l.y" /* yacc.c:1646  */
     {
         std::string dst=new_temp();
         std::string temp;
@@ -2196,7 +2198,7 @@ yyreduce:
             temp.append(". ");
             temp.append(dst);
             temp.append("\n");
-            temp += "= " + dst + ", ";
+            temp = temp + "= " + dst + ", ";
             temp.append((yyvsp[0].expression).place);
             temp.append("\n");
             temp.append((yyvsp[0].expression).code);
@@ -2206,13 +2208,13 @@ yyreduce:
         }
         temp +="* " + dst + ", "+dst + ", -1\n";
         (yyval.expression).code = strdup(temp.c_str());
-        (yyval.expression).place=strdup(temp.c_str());
+        (yyval.expression).place=strdup(dst.c_str());
     }
-#line 2212 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2214 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 713 "mini_l.y" /* yacc.c:1646  */
+#line 715 "mini_l.y" /* yacc.c:1646  */
     {
         std::string dst = new_temp();
         std::string temp;
@@ -2223,11 +2225,11 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup(dst.c_str());
     }
-#line 2227 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2229 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 723 "mini_l.y" /* yacc.c:1646  */
+#line 725 "mini_l.y" /* yacc.c:1646  */
     { 
         std::string temp;
         temp.append((yyvsp[-1].expression).code);
@@ -2239,11 +2241,11 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup((yyvsp[-1].expression).place);
     }
-#line 2243 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2245 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 734 "mini_l.y" /* yacc.c:1646  */
+#line 736 "mini_l.y" /* yacc.c:1646  */
     {
         std::string dst = new_temp();
     std::string temp;
@@ -2272,13 +2274,13 @@ yyreduce:
             varTemp[(yyvsp[0].expression).place]=dst;
         }
         (yyval.expression).code = strdup(temp.c_str());
-        (yyval.expression).place = strdup("");
+        (yyval.expression).place = strdup(dst.c_str());
     }
-#line 2278 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2280 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 764 "mini_l.y" /* yacc.c:1646  */
+#line 766 "mini_l.y" /* yacc.c:1646  */
     {
         std::string dst = new_temp();
         std::string temp;
@@ -2287,22 +2289,22 @@ yyreduce:
         temp.append("\n");
         temp= temp + "= " + dst +", " + std::to_string((yyvsp[0].num_val)) + "\n";
         (yyval.expression).code = strdup(temp.c_str());
-        (yyval.expression).place = strdup("");
+        (yyval.expression).place = strdup(dst.c_str());
     }
-#line 2293 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2295 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 774 "mini_l.y" /* yacc.c:1646  */
+#line 776 "mini_l.y" /* yacc.c:1646  */
     {
         (yyval.expression).code = strdup((yyvsp[-1].expression).code);
         (yyval.expression).place = strdup((yyvsp[-1].expression).place);
     }
-#line 2302 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2304 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 779 "mini_l.y" /* yacc.c:1646  */
+#line 781 "mini_l.y" /* yacc.c:1646  */
     {
         std::string temp;
         std::string func = (yyvsp[-3].expression).place;
@@ -2315,13 +2317,13 @@ yyreduce:
         temp.append((yyvsp[-3].expression).place);
         temp += ", " + dst + "\n";
         (yyval.expression).code = strdup(temp.c_str());
-        (yyval.expression).place = strdup("");
+        (yyval.expression).place = strdup(dst.c_str());
     }
-#line 2321 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2323 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 795 "mini_l.y" /* yacc.c:1646  */
+#line 797 "mini_l.y" /* yacc.c:1646  */
     {
         std::string temp;
         temp.append((yyvsp[0].expression).code);
@@ -2336,11 +2338,11 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup("");
     }
-#line 2340 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2342 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 810 "mini_l.y" /* yacc.c:1646  */
+#line 812 "mini_l.y" /* yacc.c:1646  */
     {
         std::string temp;
         temp.append((yyvsp[-2].expression).code);
@@ -2356,11 +2358,11 @@ yyreduce:
         (yyval.expression).code = strdup(temp.c_str());
         (yyval.expression).place = strdup("");
     }
-#line 2360 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2362 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 826 "mini_l.y" /* yacc.c:1646  */
+#line 828 "mini_l.y" /* yacc.c:1646  */
     {
     
     std::string temp;
@@ -2375,11 +2377,11 @@ yyreduce:
     (yyval.expression).place=strdup(ident.c_str());
     (yyval.expression).arr = false;
     }
-#line 2379 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2381 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 840 "mini_l.y" /* yacc.c:1646  */
+#line 842 "mini_l.y" /* yacc.c:1646  */
     {
         std::string temp;
         std::string ident = (yyvsp[-3].expression).place;
@@ -2396,11 +2398,11 @@ yyreduce:
         (yyval.expression).place = strdup(temp.c_str());
         (yyval.expression).arr = true;
     }
-#line 2400 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2402 "mini_l.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 2404 "mini_l.tab.c" /* yacc.c:1646  */
+#line 2406 "mini_l.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2628,7 +2630,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 858 "mini_l.y" /* yacc.c:1906  */
+#line 860 "mini_l.y" /* yacc.c:1906  */
 
 
 void yyerror(const char* s)

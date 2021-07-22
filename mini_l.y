@@ -61,7 +61,7 @@ std::string new_label();
 Program:    %empty
     {
         if (!mainFunc){
-            printf("No main function was declared\n");
+            printf("No main function was declared.\n");
         }
     }
     | function Program
@@ -143,7 +143,7 @@ declaration: Idents COLON INTEGER
                 ex = true;
             }
             else{
-                std::string ident = parse.substr(left, right - left);
+                std::string ident = parse.substr(left, right-left);
                 if(reserved.find(ident) != reserved.end()){
                     printf("Identifier %s's name is a reserved word, can't be used.\n", ident.c_str());
                 }
@@ -335,11 +335,12 @@ statement: var ASSIGN expression
         std::string dst=new_temp();
         std::string condition = new_label();
         std::string inner = new_label();
+        std::string increment = new_label();
         std::string after = new_label();
         std::string code = $12.code;
         size_t pos = code.find("continue");
         while(pos!=std::string::npos){
-            /*code.replace(pos, $8, ":= ");*/
+            code.replace(pos, 8, ":= "+increment);
             pos= code.find("continue");
         }
         temp.append($2.code);
@@ -362,6 +363,8 @@ statement: var ASSIGN expression
         temp +=":= "+after+"\n";
         temp +=": " + inner +"\n";
         temp.append(code);
+        temp += ": " + increment + "\n";
+        temp.append($8.code);
         temp.append($10.code);
         if($8.arr){
             temp+="[]= ";
@@ -372,7 +375,9 @@ statement: var ASSIGN expression
         temp.append($8.place);
         temp.append(", ");
         temp.append($10.place);
-        /*feel unsure here*/
+        temp += "\n";
+        temp += ":= " + condition + "\n";
+        temp += ": " + after + "\n";
         $$.code = strdup(temp.c_str());
     }
     | READ vars
@@ -537,35 +542,35 @@ FuncIdent: IDENT
 
 comp: EQ
     {
-        $$.place = strdup("");
-        $$.code = strdup("== ");
+        $$.code = strdup("");
+        $$.place = strdup("== ");
     }
-    | NEQ
+    | NEQ 
     {
-        $$.place = strdup("");
-        $$.code = strdup("!= ");
+        $$.code = strdup("");
+        $$.place = strdup("!= ");
     }
-    | LT
+    | LT 
     {
-        $$.place = strdup("");
-        $$.code = strdup("< ");
+        $$.code = strdup("");
+        $$.place = strdup("< ");
     }
-    | LTE
+    | LTE 
     {
-        $$.place = strdup("");
-        $$.code = strdup("<= ");
+        $$.code = strdup("");
+        $$.place = strdup("<= ");
     }
-    | GT
+    | GT 
     {
-        $$.place = strdup("");
-        $$.code = strdup("> ");
+        $$.code = strdup("");
+        $$.place = strdup("> ");
     }
-    | GTE
+    | GTE 
     {
-        $$.place = strdup("");
-        $$.code = strdup(">= ");
+        $$.code = strdup("");
+        $$.place = strdup(">= ");
     }
-    ;   
+    ;
 
 expressions: expression COMMA expressions 
             {
@@ -576,15 +581,16 @@ expressions: expression COMMA expressions
                 temp.append("\n");
                 temp.append($3.code);   /* I think this is sufficient, but not totally sure*/
                 $$.code=strdup(temp.c_str());
-                $$.place=strdup(temp.c_str());
+                $$.place=strdup("");
             }
             | expression {
                 std::string temp;
+                temp.append($1.code);
                 temp.append("param ");
                 temp.append($1.place);
                 temp.append("\n");
                 $$.code=strdup(temp.c_str());
-                $$.place=strdup(temp.c_str());
+                $$.place=strdup("");
             }
             ;
 
@@ -624,12 +630,8 @@ expression: multiplicative-expr {
             }
             ;
 multiplicative-expr: term {
-                    std::string temp;
-                    temp.append($1.code);
-                    temp.append($1.place);
-                    temp.append("\n");
-                    $$.code = strdup(temp.c_str());
-                    $$.place = strdup(""); /*went freeballing here, might need fixing*/
+                    $$.code = strdup($1.code);
+                    $$.place = strdup($1.place);
                     }
                     | term MULT multiplicative-expr {
                         std::string temp;
@@ -698,7 +700,7 @@ term: SUB var
             temp.append(". ");
             temp.append(dst);
             temp.append("\n");
-            temp += "= " + dst + ", ";
+            temp = temp + "= " + dst + ", ";
             temp.append($2.place);
             temp.append("\n");
             temp.append($2.code);
@@ -708,7 +710,7 @@ term: SUB var
         }
         temp +="* " + dst + ", "+dst + ", -1\n";
         $$.code = strdup(temp.c_str());
-        $$.place=strdup(temp.c_str());
+        $$.place=strdup(dst.c_str());
     }
     | SUB NUMBER {
         std::string dst = new_temp();
@@ -759,7 +761,7 @@ term: SUB var
             varTemp[$1.place]=dst;
         }
         $$.code = strdup(temp.c_str());
-        $$.place = strdup("");
+        $$.place = strdup(dst.c_str());
     } 
     | NUMBER {
         std::string dst = new_temp();
@@ -769,7 +771,7 @@ term: SUB var
         temp.append("\n");
         temp= temp + "= " + dst +", " + std::to_string($1) + "\n";
         $$.code = strdup(temp.c_str());
-        $$.place = strdup("");
+        $$.place = strdup(dst.c_str());
     }
     | L_PAREN expression R_PAREN {
         $$.code = strdup($2.code);
@@ -788,7 +790,7 @@ term: SUB var
         temp.append($1.place);
         temp += ", " + dst + "\n";
         $$.code = strdup(temp.c_str());
-        $$.place = strdup("");
+        $$.place = strdup(dst.c_str());
     }
     ;
 vars: var
