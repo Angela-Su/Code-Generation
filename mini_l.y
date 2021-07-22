@@ -16,7 +16,7 @@ bool mainFunc = false;
 std::set<std::string> funcs;
 std::set<std::string> reserved{"NUMBER", "IDENT", "RETURN", "FUNCTION", "SEMICOLON", "BEGINPARAMS", "ENDPARAMS", "BEGINLOCALS", "ENDLOCALS", "BEGINBODY", "ENDBODY", "BEGINLOOP", "ENDLOOP", "COLON", "INTEGER",
     "COMMA", "ARRAY", "L_SQUARE_BRACKET", "R_SQUARE_BRACKET", "L_PAREN", "R_PAREN", "IF", "ELSE", "THEN", "CONTINUE", "ENDIF", "OF", "READ", "WRITE", "DO", "WHILE", "FOR", "TRUE", "FALSE", "ASSIGN", "EQ", "NEQ",
-    "LT", "LTE", "GT", "GTE", "ADD", "SUB", "MULT", "DIV", "MOD", "AND", "OR", "NOT", "function", "functions", "declaration", "declarations", "var", "vars", "expression", "expressions", "Ident", 
+    "LT", "LTE", "GT", "GTE", "ADD", "SUB", "MULT", "DIV", "MOD", "AND", "OR", "NOT", "function", "functions", "declaration", "declarations", "var", "vars", "expression", "expressions", "Ident", "Idents",
     "bool_expr", "relation_and_expr", "relation_expr_inv", "relation_expr", "comp", "multiplicative-expr", "term", "statement", "statements"};
 void yyerror(const char* s);
 int yylex();
@@ -41,7 +41,7 @@ std::string new_label();
 %token <num> NUMBER
 %token <ident> IDENT
 
-%type <expression> function FuncIdent declaration declarations var vars expression expressions Ident
+%type <expression> function FuncIdent declaration declarations var vars expression expressions Ident Idents
 %type <expression> bool_expr relation_and_expr relation_expr_inv relation_expr comp multiplicative-expr term
 %type <statement> statement statements
 
@@ -118,7 +118,7 @@ declarations: %empty{
                 }
             ;
 
-declaration: Ident COLON INTEGER
+declaration: Idents COLON INTEGER
     {
         int left = 0;
         int right = 0;
@@ -163,7 +163,7 @@ declaration: Ident COLON INTEGER
         $$.code = strdup(temp.c_str());
         $$.place = strdup("");
     }
-    | Ident COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
+    | Idents COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
     {
         size_t left = 0;
         size_t right = 0;
@@ -172,7 +172,7 @@ declaration: Ident COLON INTEGER
         bool ex = false;
         while(!ex){
             right = parse.find("|", left);
-            temp.append(".[]");
+            temp.append(".[] ");
             if(right == std::string::npos){
                 std::string ident = parse.substr(left, right);
                 if(reserved.find(ident) != reserved.end()){
@@ -217,6 +217,42 @@ declaration: Ident COLON INTEGER
         $$.place = strdup("");
     }
     ;
+    
+Ident: IDENT
+    {
+        $$.place = strdup($1);
+        $$.code = strdup("");
+    }
+    ;
+    
+Idents: Ident
+    {
+        $$.place = strdup($1.place);
+        $$.code = strdup("");
+    }
+    | Ident COMMA Idents
+    {
+        std::string temp;
+        temp.append($1.place);
+        temp.append("|");
+        temp.append($3.place);
+        $$.place = strdup(temp.c_str());
+        $$.code = strdup("");
+    }
+    ; 
+
+FuncIdent: IDENT
+    {
+        if (funcs.find($1) != funcs.end()){
+            printf("function name %s already declared.\n", $1);
+        }
+        else{
+            funcs.insert($1);
+        }
+    $$.place = strdup($1);
+    $$.code = strdup("");
+    }
+    ;    
         
 statements: statement SEMICOLON statements
     {
@@ -502,42 +538,6 @@ relation_expr: expression comp expression
     {
         $$.code = strdup($2.code);
         $$.place = strdup($2.place);
-    }
-    ;
-
-Ident: IDENT
-    {
-        $$.place = strdup($1);
-        $$.code = strdup("");
-    }
-    ;
-    
-/*Idents: Ident
-    {
-        $$.place = strdup($1);
-        $$.code = strdup("");
-    }
-    | Ident COMMA Idents
-    {
-        std::string temp;
-        temp.append($1.place);
-        temp.append("|");
-        temp.append($3.place);
-        $$.place = strdup(temp.c_str());
-        $$.code = strdup("");
-    }
-    ; */
-
-FuncIdent: IDENT
-    {
-        if (funcs.find($1) != funcs.end()){
-            printf("function name %s already declared.\n", $1);
-        }
-        else{
-            funcs.insert($1);
-        }
-    $$.place = strdup($1);
-    $$.code = strdup("");
     }
     ;
 
