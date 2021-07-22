@@ -17,7 +17,7 @@ std::set<std::string> funcs;
 std::set<std::string> reserved{"NUMBER", "IDENT", "RETURN", "FUNCTION", "SEMICOLON", "BEGINPARAMS", "ENDPARAMS", "BEGINLOCALS", "ENDLOCALS", "BEGINBODY", "ENDBODY", "BEGINLOOP", "ENDLOOP", "COLON", "INTEGER",
     "COMMA", "ARRAY", "L_SQUARE_BRACKET", "R_SQUARE_BRACKET", "L_PAREN", "R_PAREN", "IF", "ELSE", "THEN", "CONTINUE", "ENDIF", "OF", "READ", "WRITE", "DO", "WHILE", "FOR", "TRUE", "FALSE", "ASSIGN", "EQ", "NEQ",
     "LT", "LTE", "GT", "GTE", "ADD", "SUB", "MULT", "DIV", "MOD", "AND", "OR", "NOT", "function", "functions", "declaration", "declarations", "var", "vars", "expression", "expressions", "Ident", 
-    "bool_expr", "relation_and_expr", "relation_and_inv", "relation_expr", "comp", "multiplicative-expr", "term", "statement", "statements"};
+    "bool_expr", "relation_and_expr", "relation_expr_inv", "relation_expr", "comp", "multiplicative-expr", "term", "statement", "statements"};
 void yyerror(const char* s);
 int yylex();
 std::string new_temp();
@@ -25,8 +25,8 @@ std::string new_label();
 %}
 
 %union{
-    int num_val;
-    char * id_val;
+    int num;
+    char* ident;
     struct S{
         char* code;
     } statement;
@@ -36,21 +36,23 @@ std::string new_label();
         bool arr;
     } expression;
 }
-%error-verbose
-%start Program
-%token FUNCTION BEGINPARAMS ENDPARAMS BEGINLOCALS ENDLOCALS BEGINBODY ENDBODY INTEGER ARRAY ENUM OF IF THEN ENDIF ELSE WHILE FOR DO BEGINLOOP ENDLOOP CONTINUE READ WRITE TRUE FALSE SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN RETURN
-%token <id_val> IDENT
-%token <num_val> NUMBER
-%type <expression> function declarations declaration vars var expressions expression Ident FuncIdent
+
+%start Program 
+%token <num> NUMBER
+%token <ident> IDENT
+
+%type <expression> function FuncIdent declaration declarations var vars expression expressions Ident
 %type <expression> bool_expr relation_and_expr relation_expr_inv relation_expr comp multiplicative-expr term
-%type <statement> statements statement
-%right ASSIGN
-%left OR
-%left AND
+%type <statement> statement statements
+
+%token RETURN FUNCTION SEMICOLON BEGINPARAMS ENDPARAMS BEGINLOCALS ENDLOCALS BEGINBODY ENDBODY BEGINLOOP ENDLOOP
+%token COLON INTEGER COMMA ARRAY L_SQUARE_BRACKET R_SQUARE_BRACKET L_PAREN R_PAREN
+%token IF ELSE THEN CONTINUE ENDIF OF READ WRITE DO WHILE FOR
+%token TRUE FALSE
+
+%left ASSIGN EQ NEQ LT LTE GT GTE ADD SUB MULT DIV MOD AND OR
 %right NOT
-%left LT LTE GT GTE EQ NEQ
-%left ADD SUB
-%left MULT DIV MOD
+
 %%
 
 /*prog_start: functions { printf("prog_start -> functions\n");}
