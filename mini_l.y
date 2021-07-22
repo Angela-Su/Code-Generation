@@ -9,14 +9,14 @@
 int tempCount = 0;
 int labelCount = 0;
 extern char* yytext;
-extern int num_columns;
+extern int currPos;
 std::map<std::string, std::string> varTemp;
 std::map<std::string, int> arrSize;
 bool mainFunc = false;
 std::set<std::string> funcs;
 std::set<std::string> reserved{"NUMBER", "IDENT", "RETURN", "FUNCTION", "SEMICOLON", "BEGINPARAMS", "ENDPARAMS", "BEGINLOCALS", "ENDLOCALS", "BEGINBODY", "ENDBODY", "BEGINLOOP", "ENDLOOP", "COLON", "INTEGER",
     "COMMA", "ARRAY", "L_SQUARE_BRACKET", "R_SQUARE_BRACKET", "L_PAREN", "R_PAREN", "IF", "ELSE", "THEN", "CONTINUE", "ENDIF", "OF", "READ", "WRITE", "DO", "WHILE", "FOR", "TRUE", "FALSE", "ASSIGN", "EQ", "NEQ",
-    "LT", "LTE", "GT", "GTE", "ADD", "SUB", "MULT", "DIV", "MOD", "AND", "OR", "NOT", "function", "functions", "declaration", "declarations", "var", "vars", "expression", "expressions", "Ident", 
+    "LT", "LTE", "GT", "GTE", "ADD", "SUB", "MULT", "DIV", "MOD", "AND", "OR", "NOT", "function", "functions", "declaration", "declarations", "var", "vars", "expression", "expressions", "Ident", "Idents",
     "bool_expr", "relation_and_expr", "relation_and_inv", "relation_expr", "comp", "multiplicative-expr", "term", "statement", "statements"};
 void yyerror(const char* s);
 int yylex();
@@ -42,7 +42,7 @@ std::string new_label();
 %token FUNCTION BEGINPARAMS ENDPARAMS BEGINLOCALS ENDLOCALS BEGINBODY ENDBODY INTEGER ARRAY ENUM OF IF THEN ENDIF ELSE WHILE FOR DO BEGINLOOP ENDLOOP CONTINUE READ WRITE TRUE FALSE SEMICOLON COLON COMMA L_PAREN R_PAREN L_SQUARE_BRACKET R_SQUARE_BRACKET ASSIGN RETURN
 %token <id_val> IDENT
 %token <num_val> NUMBER
-%type <expression> function declarations declaration vars var expressions expression Ident FuncIdent
+%type <expression> function declarations declaration vars var expressions expression Ident Idents FuncIdent
 %type <expression> bool_expr relation_and_expr relation_expr_inv relation_expr comp multiplicative-expr term
 %type <statement> statements statement
 %right ASSIGN
@@ -83,7 +83,7 @@ function: FUNCTION FuncIdent SEMICOLON BEGINPARAMS declarations ENDPARAMS BEGINL
         int decNum = 0;
         while(decs.find(".") != std::string::npos){
             int pos = decs.find(".");
-            decs.replace(pos, 1, "=");
+            decs.replace(pos, 1, "= ");
             std::string part = ", $" + std::to_string(decNum) + "\n";
             decNum++;
             decs.replace(decs.find("\n", pos), 1, part);
@@ -117,7 +117,7 @@ declarations: %empty{
                 }
             ;
 
-declaration: Ident COLON INTEGER
+declaration: Idents COLON INTEGER
     {
         int left = 0;
         int right = 0;
@@ -126,7 +126,7 @@ declaration: Ident COLON INTEGER
         bool ex = false;
         while(!ex){
             right = parse.find("|", left);
-            temp.append(".");
+            temp.append(". ");
             if(right == std::string::npos){
                 std::string ident = parse.substr(left, right);
                 if(reserved.find(ident) != reserved.end()){
@@ -162,7 +162,7 @@ declaration: Ident COLON INTEGER
         $$.code = strdup(temp.c_str());
         $$.place = strdup("");
     }
-    | Ident COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
+    | Idents COLON ARRAY L_SQUARE_BRACKET NUMBER R_SQUARE_BRACKET OF INTEGER
     {
         size_t left = 0;
         size_t right = 0;
@@ -506,9 +506,9 @@ Ident: IDENT
     }
     ;
     
-/*Idents: Ident
+Idents: Ident
     {
-        $$.place = strdup($1);
+        $$.place = strdup($1.place);
         $$.code = strdup("");
     }
     | Ident COMMA Idents
@@ -520,7 +520,7 @@ Ident: IDENT
         $$.place = strdup(temp.c_str());
         $$.code = strdup("");
     }
-    ; */
+    ; 
 
 FuncIdent: IDENT
     {
@@ -588,7 +588,10 @@ expressions: expression COMMA expressions
             }
             ;
 
-expression: multiplicative-expr {printf("expression -> multiplicative-expr\n");}
+expression: multiplicative-expr {
+                $$.code = strdup($1.code);
+        $$.place = strdup($1.place);
+            }
             | multiplicative-expr ADD multiplicative-expr {
                 std::string temp;
                 std::string dst= new_temp();
@@ -712,7 +715,7 @@ term: SUB var
         std::string temp;
         temp.append(". ");
         temp.append(dst);
-        temp.append("/n");
+        temp.append("\n");
         temp= temp + "= " + dst +", -" + std::to_string($2) + "\n";
         $$.code = strdup(temp.c_str());
         $$.place = strdup(dst.c_str());
@@ -756,17 +759,17 @@ term: SUB var
             varTemp[$1.place]=dst;
         }
         $$.code = strdup(temp.c_str());
-        $$.place = strdup(dst.c_str());
+        $$.place = strdup("");
     } 
     | NUMBER {
         std::string dst = new_temp();
         std::string temp;
         temp.append(". ");
         temp.append(dst);
-        temp.append("/n");
+        temp.append("\n");
         temp= temp + "= " + dst +", " + std::to_string($1) + "\n";
         $$.code = strdup(temp.c_str());
-        $$.place = strdup(dst.c_str());
+        $$.place = strdup("");
     }
     | L_PAREN expression R_PAREN {
         $$.code = strdup($2.code);
@@ -785,7 +788,7 @@ term: SUB var
         temp.append($1.place);
         temp += ", " + dst + "\n";
         $$.code = strdup(temp.c_str());
-        $$.place = strdup(dst.c_str());
+        $$.place = strdup("");
     }
     ;
 vars: var
@@ -859,7 +862,7 @@ void yyerror(const char* s)
     extern int yylineno;
     extern char *yytext;
 
-        printf("%s on line %d at char %d at symbol \"%s\"\n", s, yylineno, num_columns, yytext);
+        printf("%s on line %d at char %d at symbol \"%s\"\n", s, yylineno, currPos, yytext);
         exit(1);
 }
 
