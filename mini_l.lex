@@ -30,7 +30,6 @@ E_ID_1  [0-9_][a-zA-Z0-9_]*
 "endbody"       {return ENDBODY; num_columns += yyleng;}
 "integer"       {return INTEGER; num_columns += yyleng;}
 "array"         {return ARRAY; num_columns += yyleng;}
-"enum"          {return ENUM; num_columns += yyleng;}
 "of"            {return OF; num_columns += yyleng;}
 "if"            {return IF; num_columns += yyleng;}
 "then"          {return THEN; num_columns += yyleng;}
